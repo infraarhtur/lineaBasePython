@@ -1,0 +1,12 @@
+app:
+  name: "Client Management System"
+  version: "1.0.0"
+  host: "127.0.0.1"
+  port: 8000
+
+database:
+  url: "sqlite:////Users/arhtur/Bases de datos/lineaBase"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

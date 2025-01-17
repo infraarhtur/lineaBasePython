@@ -1,7 +1,7 @@
-fastapi
+fastapi==0.115.6
 uvicorn[standard]
-pydantic
-PyYAML
-sqlite-utils
-sqlalchemy
+pydantic==2.10.4
+PyYAML==6.0.2
+sqlite-utils==3.38
+SQLAlchemy==2.0.37
 

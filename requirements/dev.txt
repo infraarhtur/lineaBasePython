@@ -1,6 +1,6 @@
 -r base.txt
-pytest
-pytest-cov
-black
-flake8
+pytest==8.3.4
+pytest-cov==6.0.0
+black==24.10.0
+flake8==7.1.1
 mypy

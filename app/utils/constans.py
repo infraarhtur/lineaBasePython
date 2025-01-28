@@ -1,9 +1,14 @@
 # app/utils/constants.py
 
-# Mensajes de error
-ERROR_NOT_FOUND = "El recurso solicitado no fue encontrado."
-ERROR_VALIDATION = "Los datos proporcionados no son válidos."
-ERROR_INTERNAL_SERVER = "Error interno del servidor"
+# Error messages
+ERROR_INVALID_UUID = "The provided ID is not a valid UUID."
+ERROR_CLIENT_NOT_FOUND = "Client with ID '{client_id}' not found."
+ERROR_EMAIL_ALREADY_EXISTS = "A client with the email '{email}' already exists."
+ERROR_MISSING_REQUIRED_FIELDS = "Name and email are required fields."
+ERROR_NOT_FOUND = "The requested resource was not found."
+ERROR_VALIDATION = "The provided data is not valid."
+ERROR_INTERNAL_SERVER = "An internal server error occurred. Please try again later."
+
 
 # Códigos de estado HTTP
 HTTP_STATUS_OK = 200

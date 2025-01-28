@@ -6,7 +6,7 @@ from app.data.client_repository import ClientRepository
 from app.models.client_model import ClientModel
 from typing import Optional, List
 import uuid
-
+from app.utils import constans as const
 from app.utils.error_handling import NotFoundError, ValidationError
 
 
@@ -41,15 +41,15 @@ class ClientLogic:
         try:
             # Validar campos obligatorios
             if not kwargs.get("name") or not kwargs.get("email"):
-                raise ValidationError("El nombre y el correo electrónico son obligatorios.")
+                raise ValidationError(const.ERROR_MISSING_REQUIRED_FIELDS)
 
             # Crear instancia del cliente
             client = ClientModel(**kwargs)
             return self.client_repo.save(client)
         
         except SQLAlchemyError as e:
-            if "UNIQUE constraint failed" in str(e.orig):
-                raise ValidationError(f"Ya existe un cliente con el correo electrónico '{kwargs.get('email')}'.")             
+            if "UNIQUE constraint failed" in str(e.orig): 
+                raise ValidationError(const.ERROR_EMAIL_ALREADY_EXISTS.format(email = kwargs.get('email')))             
             raise e
        
 
@@ -69,7 +69,7 @@ class ClientLogic:
             # Validar que el client_id sea un UUID válido
             client_id = uuid.UUID(client_id)
         except ValueError:
-            raise ValidationError(f"El ID '{client_id}' no es un ID válido.")
+            raise ValidationError(const.ERROR_INVALID_UUID)
         
 
         try:
@@ -78,7 +78,7 @@ class ClientLogic:
             raise e
 
         if not client:
-            raise NotFoundError(f"Cliente con ID {client_id} no encontrado.")
+            raise NotFoundError(const.ERROR_CLIENT_NOT_FOUND.format(client_id=client_id))
         return client
        
 
@@ -121,7 +121,7 @@ class ClientLogic:
                 return self.client_repo.save(client)
         except SQLAlchemyError as e:
             if "UNIQUE constraint failed" in str(e.orig):
-                raise ValidationError(f"Ya existe un cliente con el correo electrónico '{email}'.")
+                raise ValidationError(const.ERROR_EMAIL_ALREADY_EXISTS.format(email = email))
             raise e
 
 
@@ -142,4 +142,3 @@ class ClientLogic:
             return self.client_repo.delete(client)
         except SQLAlchemyError as e:
             raise e
-        # return self.client_repo.delete(client_id)

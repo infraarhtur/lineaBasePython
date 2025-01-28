@@ -6,7 +6,7 @@ from app.data.database import get_db
 from app.models.client_model import ClientCreateSchema, ClientSchema
 from app.logic.client_logic import ClientLogic
 from app.utils.error_handling import NotFoundError, ValidationError
-# from app.utils import constants as const
+from app.utils import constans as const
 
 router = APIRouter()
 
@@ -30,7 +30,7 @@ def create_client(client: ClientCreateSchema, db: Session = Depends(get_db)):
     except NotFoundError as ne:
         raise HTTPException(status_code=404, detail=str(ne))
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Error interno del servidor")
+        raise HTTPException(status_code=500, detail=const.ERROR_INTERNAL_SERVER)
 
     
 
@@ -55,7 +55,7 @@ def get_all_clients(db: Session = Depends(get_db)):
         return clients
     except Exception as e:
         # Captura de errores inesperados o de la base de datos
-        raise HTTPException(status_code=500, detail="Error interno del servidor")
+        raise HTTPException(status_code=500, detail=const.ERROR_INTERNAL_SERVER)
 
 @router.get("/clients/{client_id}", response_model=ClientSchema)
 def get_client(client_id: str, db: Session = Depends(get_db)):
@@ -82,7 +82,7 @@ def get_client(client_id: str, db: Session = Depends(get_db)):
     except NotFoundError as ne:
         raise HTTPException(status_code=404, detail=str(ne))
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Error interno del servidor")
+        raise HTTPException(status_code=500, detail=const.ERROR_INTERNAL_SERVER)
 
 @router.put("/clients/{client_id}", response_model=ClientSchema)
 def update_client(client_id: str, client: ClientCreateSchema, db: Session = Depends(get_db)):
@@ -104,16 +104,14 @@ def update_client(client_id: str, client: ClientCreateSchema, db: Session = Depe
     try:
         updated_client = service.update_client(
             client_id=client_id, name=client.name, email=client.email, phone=client.phone
-        )
-        if not updated_client:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Client not found")
+        )        
         return updated_client
     except ValidationError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except NotFoundError as ne:
         raise HTTPException(status_code=404, detail=str(ne))
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Error interno del servidor")
+        raise HTTPException(status_code=500, detail=const.ERROR_INTERNAL_SERVER)
 
 @router.delete("/clients/{client_id}" ,response_model=bool, status_code=status.HTTP_200_OK)
 def delete_client(client_id: str, db: Session = Depends(get_db)):
@@ -135,4 +133,4 @@ def delete_client(client_id: str, db: Session = Depends(get_db)):
     except NotFoundError as ne:
         raise HTTPException(status_code=404, detail=str(ne))
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Error interno del servidor")
+        raise HTTPException(status_code=500, detail=const.ERROR_INTERNAL_SERVER)

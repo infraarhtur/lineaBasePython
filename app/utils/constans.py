@@ -3,6 +3,7 @@
 # Mensajes de error
 ERROR_NOT_FOUND = "El recurso solicitado no fue encontrado."
 ERROR_VALIDATION = "Los datos proporcionados no son válidos."
+ERROR_INTERNAL_SERVER = "Error interno del servidor"
 
 # Códigos de estado HTTP
 HTTP_STATUS_OK = 200

@@ -5,6 +5,8 @@ from typing import List
 from app.data.database import get_db
 from app.models.client_model import ClientCreateSchema, ClientSchema
 from app.logic.client_logic import ClientLogic
+from app.utils.error_handling import NotFoundError, ValidationError
+# from app.utils import constants as const
 
 router = APIRouter()
 
@@ -20,22 +22,40 @@ def create_client(client: ClientCreateSchema, db: Session = Depends(get_db)):
     Returns:
         ClientSchema: Cliente creado.
     """
-    service = ClientLogic(db)
-    return service.create_client(name=client.name, email=client.email, phone=client.phone)
+    try:
+        service = ClientLogic(db)
+        return service.create_client(name=client.name, email=client.email, phone=client.phone)
+    except ValidationError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except NotFoundError as ne:
+        raise HTTPException(status_code=404, detail=str(ne))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
+
+    
 
 @router.get("/clients/", response_model=List[ClientSchema])
 def get_all_clients(db: Session = Depends(get_db)):
+
     """
     Recupera todos los clientes.
 
     Args:
-        db (Session): Sesión de base de datos inyectada automáticamente.
+        db (Session): Sesión activa de SQLAlchemy para la base de datos.
 
     Returns:
         List[ClientSchema]: Lista de todos los clientes.
+
+    Raises:
+        HTTPException: Si ocurre un error relacionado con la base de datos.
     """
-    service = ClientLogic(db)
-    return service.get_all_clients()
+    logic = ClientLogic(db)
+    try:
+        clients = logic.get_all_clients()
+        return clients
+    except Exception as e:
+        # Captura de errores inesperados o de la base de datos
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
 
 @router.get("/clients/{client_id}", response_model=ClientSchema)
 def get_client(client_id: str, db: Session = Depends(get_db)):
@@ -52,11 +72,17 @@ def get_client(client_id: str, db: Session = Depends(get_db)):
     Raises:
         HTTPException: Si el cliente no existe.
     """
-    service = ClientLogic(db)
-    client = service.get_client_by_id(client_id)
-    if not client:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Client not found")
-    return client
+
+    logic = ClientLogic(db)
+    try:
+        client = logic.get_client_by_id(client_id)
+        return client
+    except ValidationError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except NotFoundError as ne:
+        raise HTTPException(status_code=404, detail=str(ne))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
 
 @router.put("/clients/{client_id}", response_model=ClientSchema)
 def update_client(client_id: str, client: ClientCreateSchema, db: Session = Depends(get_db)):
@@ -75,26 +101,38 @@ def update_client(client_id: str, client: ClientCreateSchema, db: Session = Depe
         HTTPException: Si el cliente no existe.
     """
     service = ClientLogic(db)
-    updated_client = service.update_client(
-        client_id=client_id, name=client.name, email=client.email, phone=client.phone
-    )
-    if not updated_client:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Client not found")
-    return updated_client
+    try:
+        updated_client = service.update_client(
+            client_id=client_id, name=client.name, email=client.email, phone=client.phone
+        )
+        if not updated_client:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Client not found")
+        return updated_client
+    except ValidationError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except NotFoundError as ne:
+        raise HTTPException(status_code=404, detail=str(ne))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
 
-@router.delete("/clients/{client_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/clients/{client_id}" ,response_model=bool, status_code=status.HTTP_200_OK)
 def delete_client(client_id: str, db: Session = Depends(get_db)):
     """
     Elimina un cliente por su ID.
 
     Args:
         client_id (str): ID del cliente a eliminar.
-        db (Session): Sesión de base de datos inyectada automáticamente.
+        db (Session): Sesión activa de SQLAlchemy para la base de datos.
 
     Raises:
-        HTTPException: Si el cliente no existe.
+        HTTPException: Si ocurre algún error relacionado con validaciones, datos no encontrados o errores internos.
     """
-    service = ClientLogic(db)
-    success = service.delete_client(client_id)
-    if not success:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Client not found")
+    logic = ClientLogic(db)
+    try:
+        return logic.delete_client(client_id)
+    except ValidationError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except NotFoundError as ne:
+        raise HTTPException(status_code=404, detail=str(ne))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error interno del servidor")

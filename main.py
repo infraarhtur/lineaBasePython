@@ -3,9 +3,7 @@ from fastapi import FastAPI
 from app.view.client_endpoints import router
 from app.data.database import Base, engine
 from app.config import Config
-
 import os
-
 # Crear el directorio para la base de datos si no existe
 os.makedirs("data", exist_ok=True)
 

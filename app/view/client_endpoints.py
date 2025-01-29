@@ -1,12 +1,14 @@
 # app/view/client_endpoints.py
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
+
 from app.data.database import get_db
-from app.models.client_model import ClientCreateSchema, ClientSchema
 from app.logic.client_logic import ClientLogic
-from app.utils.error_handling import NotFoundError, ValidationError
+from app.models.client_model import ClientCreateSchema, ClientSchema
 from app.utils import constans as const
+from app.utils.error_handling import NotFoundError, ValidationError
 
 router = APIRouter()
 
@@ -103,7 +105,8 @@ def update_client(client_id: str, client: ClientCreateSchema, db: Session = Depe
     service = ClientLogic(db)
     try:
         updated_client = service.update_client(
-            client_id=client_id, name=client.name, email=client.email, phone=client.phone
+            client_id=client_id, name=client.name, email=client.email, 
+            phone=client.phone
         )        
         return updated_client
     except ValidationError as ve:
@@ -113,7 +116,8 @@ def update_client(client_id: str, client: ClientCreateSchema, db: Session = Depe
     except Exception as e:
         raise HTTPException(status_code=500, detail=const.ERROR_INTERNAL_SERVER)
 
-@router.delete("/clients/{client_id}" ,response_model=bool, status_code=status.HTTP_200_OK)
+@router.delete("/clients/{client_id}" ,response_model=bool,
+                status_code=status.HTTP_200_OK)
 def delete_client(client_id: str, db: Session = Depends(get_db)):
     """
     Elimina un cliente por su ID.
@@ -123,7 +127,8 @@ def delete_client(client_id: str, db: Session = Depends(get_db)):
         db (Session): Sesión activa de SQLAlchemy para la base de datos.
 
     Raises:
-        HTTPException: Si ocurre algún error relacionado con validaciones, datos no encontrados o errores internos.
+        HTTPException: Si ocurre algún error relacionado con validaciones,
+          datos no encontrados o errores internos.
     """
     logic = ClientLogic(db)
     try:

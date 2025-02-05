@@ -139,3 +139,51 @@ def delete_client(client_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail=str(ne))
     except Exception as e:
         raise HTTPException(status_code=500, detail=const.ERROR_INTERNAL_SERVER)
+    
+
+@router.post("/clients_queue/", response_model=str, 
+                 status_code=status.HTTP_202_ACCEPTED)
+def create_clien_queue(client: ClientCreateSchema):
+    """
+    Crea un nuevo cliente.
+
+    Args:
+        client (ClientCreateSchema): Datos del cliente a crear.
+        db (Session): Sesión de base de datos inyectada automáticamente.
+
+    Returns:
+        ClientSchema: Cliente creado.
+    """
+    try:
+        service = ClientLogic()
+        return service.create_client_queue(name=client.name, email=client.email, phone=client.phone)
+    except ValidationError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except NotFoundError as ne:
+        raise HTTPException(status_code=404, detail=str(ne))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=const.ERROR_INTERNAL_SERVER)
+    
+    
+@router.get("/process_messages_queue/", response_model=List, 
+                 status_code=status.HTTP_202_ACCEPTED)
+def process_messages_queue():
+    """
+    Crea un nuevo cliente.
+
+    Args:
+        client (ClientCreateSchema): Datos del cliente a crear.
+        db (Session): Sesión de base de datos inyectada automáticamente.
+
+    Returns:
+        ClientSchema: Cliente creado.
+    """
+    try:
+        service = ClientLogic()
+        return service.process_messages_queue()
+    except ValidationError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except NotFoundError as ne:
+        raise HTTPException(status_code=404, detail=str(ne))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=const.ERROR_INTERNAL_SERVER)

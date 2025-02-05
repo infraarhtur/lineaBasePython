@@ -1,29 +1,36 @@
 {
+    // 🔍 Configuración de pruebas con pytest
     "python.testing.pytestArgs": [
         "app",
         "tests"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "python.linting.flake8Enabled": true,
+
+    // 🔍 Configuración de linting con flake8
     "python.linting.enabled": true,
+    "python.linting.flake8Enabled": true,
+
+    // 🔍 Configuración de formateo con Black
     "python.formatting.provider": "black",
-    "python.analysis.typeCheckingMode": "basic",
     "python.formatting.blackArgs": [
-        "-l 79"
+        "--line-length", "79",  // Define el límite de caracteres por línea
+        "--skip-string-normalization"  // No modifica comillas en strings
     ],
+
+    // 🔍 Configuración del editor para mejorar la legibilidad del código
     "[python]": {
-        "editor.rulers": [
-            79
-        ],
+        "editor.rulers": [79],  // Muestra una línea guía en la columna 79
         "editor.formatOnSaveMode": "file",
-        "editor.formatOnSave": true,
+        "editor.formatOnSave": true,  // Formatea automáticamente al guardar
         "editor.codeActionsOnSave": {
-            "source.organizeImports": true
-        },
+            "source.organizeImports": true  // Ordena importaciones al guardar
+        }
     },
+
+    // 🔍 Configuración de isort para ordenar importaciones compatible con Black
     "isort.args": [
-        "--profile",
-        "black"
-    ],
+        "--profile", "black",
+        "--line-length", "79"
+    ]
 }

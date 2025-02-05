@@ -4,7 +4,7 @@ intento que este proyecto me sirva como estudio y guia para otros proyectos
 
 
 # arquitectura inicial
-
+```
 Copia de lineaBasePython/
 │── .gitignore
 │── .env
@@ -36,6 +36,6 @@ Copia de lineaBasePython/
 │   │   ├── error_handling.py    # Manejo de errores centralizado
 │   │   ├── data_utils.py        # Funciones auxiliares para manipulación de datos
 
-
+```
 # requirements
 

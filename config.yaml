@@ -10,3 +10,8 @@ database:
 logging:
   level: "INFO"
   format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+sqs:
+  url-queue-client: "https://sqs.us-east-1.amazonaws.com/142911054234/client-queue"
+url-queue-client: "https://sqs.us-east-1.amazonaws.com/142911054234/client-queue"
+

@@ -1,11 +1,13 @@
-# app/logic/client_logic.py
-from sqlite3 import IntegrityError
-from sqlalchemy.orm import Session
+import json
+import uuid
+from typing import List, Optional
+
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
+
 from app.data.client_repository import ClientRepository
 from app.models.client_model import ClientModel
-from typing import Optional, List
-import uuid
+from app.services.message_service import MessageService
 from app.utils import constans as const
 from app.utils.error_handling import NotFoundError, ValidationError
 
@@ -15,14 +17,23 @@ class ClientLogic:
     Clase que encapsula la lógica de negocio para los clientes.
     Se comunica con el ClientRepository para manejar las operaciones de datos.
     """
-    def __init__(self, db: Session):
+    def __init__(self, db: Session = None):
         """
         Constructor de la clase ClientLogic.
 
         Args:
             db (Session): Sesión activa de SQLAlchemy para interactuar con la base de datos.
         """
-        self.client_repo = ClientRepository(db)
+
+        self.db = db
+        if self.db is Session :
+            self.client_repo = ClientRepository(self.db)
+        # self.client_repo = ClientRepository(db)
+    
+    def __delete__(self):
+        """Cierra la sesión automáticamente cuando se destruye la instancia"""
+        if self.db:
+            self.db.close()
 
     def create_client(self, **kwargs) -> ClientModel:
         """
@@ -48,7 +59,7 @@ class ClientLogic:
             return self.client_repo.save(client)
         
         except SQLAlchemyError as e:
-            if "UNIQUE constraint failed" in str(e.orig): 
+            if "UNIQUE constraint failed" in str(e.orig):  
                 raise ValidationError(const.ERROR_EMAIL_ALREADY_EXISTS.format(email = kwargs.get('email')))             
             raise e
        
@@ -67,7 +78,7 @@ class ClientLogic:
 
         try:
             # Validar que el client_id sea un UUID válido
-            client_id = uuid.UUID(client_id)
+            client_id = uuid.UUID(client_id) 
         except ValueError:
             raise ValidationError(const.ERROR_INVALID_UUID)
         
@@ -96,7 +107,7 @@ class ClientLogic:
             raise e
         return clients
 
-    def update_client(self, client_id: str, name: str = None, email: str = None, phone: str = None) -> Optional[ClientModel]:
+    def update_client(self, client_id: str, name: str = None, email: str = None, phone: str = None) -> Optional[ClientModel]: 
         """
         Actualiza la información de un cliente.
 
@@ -113,7 +124,7 @@ class ClientLogic:
             
             if client:
                 if name:
-                    client.name = name
+                    client.name = name 
                 if email:
                     client.email = email
                 if phone:
@@ -142,3 +153,39 @@ class ClientLogic:
             return self.client_repo.delete(client)
         except SQLAlchemyError as e:
             raise e
+
+    def create_client_queue(self, **kwargs):
+        """
+            Crea un nuevo cliente.
+
+            Args:
+                **kwargs: Argumentos con las propiedades del cliente (excepto el ID).
+
+            Returns:
+                ClientModel: Instancia del cliente creado.
+
+            Raises:
+                ValidationError: Si los datos proporcionados son inválidos.
+                SQLAlchemyError: Si ocurre un error durante la operación en la base de datos.
+        """
+        try:
+            
+            message_service = MessageService()
+        # Procesar mensajes recibidos en la cola
+            # message_service.process_messages()            
+            return message_service.enviar_mensaje(kwargs)       
+        
+        except Exception as e:
+            raise e
+        
+    def process_messages_queue(self):
+        """
+        Recibe y procesa los mensajes de la cola SQS
+         """
+        try:            
+            message_service = MessageService()
+            return message_service.process_messages()
+        except Exception as e:
+            raise e
+
+       

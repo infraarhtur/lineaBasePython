@@ -35,7 +35,7 @@ class Config:
         except yaml.YAMLError as e:
             raise ValueError(f"Error al procesar el archivo YAML: {e}")
 
-    def get(self, section: str, key: str, default: Any = None) -> Any:
+    def get(self, section: str, key: str = None, default: Any = None) -> Any:
         """
         Obtiene un valor específico de la configuración.
 
@@ -47,4 +47,7 @@ class Config:
         Returns:
             Any: Valor correspondiente a la clave o el valor por defecto.
         """
+        if key is None:  # Si solo se pasa una clave, buscar en el nivel raíz
+            return self.config.get(section, default)
+    
         return self.config.get(section, {}).get(key, default)

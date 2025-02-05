@@ -1,9 +1,21 @@
 # main.py
-from fastapi import FastAPI
-from app.view.client_endpoints import router
-from app.data.database import Base, engine
-from app.config import Config
 import os
+
+from dotenv import load_dotenv
+from fastapi import FastAPI
+
+from app.config import Config
+from app.data.database import Base, engine
+from app.view.client_endpoints import router
+
+# load_dotenv()
+
+# print(os.getenv("AWS_ACCESS_KEY_ID"))
+# print(os.getenv("AWS_SECRET_ACCESS_KEY"))
+
+
+# print(os.getenv("AWS_ACCESS_KEY_ID"))
+# print(os.getenv("AWS_SECRET_ACCESS_KEY"))
 # Crear el directorio para la base de datos si no existe
 os.makedirs("data", exist_ok=True)
 

@@ -5,7 +5,7 @@ intento que este proyecto me sirva como estudio y guia para otros proyectos
 
 # arquitectura inicial
 ```
-Copia de lineaBasePython/
+
 │── .gitignore
 │── .env
 │── .python-version

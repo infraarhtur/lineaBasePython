@@ -24,7 +24,7 @@
         "editor.formatOnSaveMode": "file",
         "editor.formatOnSave": true,  // Formatea automáticamente al guardar
         "editor.codeActionsOnSave": {
-            "source.organizeImports": true  // Ordena importaciones al guardar
+            "source.organizeImports":"explicit"  // Ordena importaciones al guardar
         }
     },
 

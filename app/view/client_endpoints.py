@@ -9,6 +9,7 @@ from app.logic.client_logic import ClientLogic
 from app.models.client_model import ClientCreateSchema, ClientSchema
 from app.utils import constans as const
 from app.utils.error_handling import NotFoundError, ValidationError
+from app.workers.scheduler import start_worker
 
 router = APIRouter()
 

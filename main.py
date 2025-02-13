@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from app.config import Config
 from app.data.database import Base, engine
 from app.view.client_endpoints import router
+from app.workers.scheduler import start_worker  # Importar el worker
 
 # load_dotenv()
 
@@ -38,6 +39,16 @@ app = FastAPI(
 
 # Incluir el router
 app.include_router(router, prefix="/api", tags=["Clients"])
+
+# Iniciar el worker cuando se inicia la aplicación
+@app.on_event("startup")
+def startup_event():
+    print("[Main] Iniciando aplicación y worker...")
+    start_worker()
+
+@app.on_event("shutdown")
+def shutdown_event():
+    print("[Main] Apagando aplicación y worker...")
 
 if __name__ == "__main__":
     import uvicorn

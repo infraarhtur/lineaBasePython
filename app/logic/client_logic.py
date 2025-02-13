@@ -26,13 +26,12 @@ class ClientLogic:
         """
 
         self.db = db
-        if self.db is Session :
+        if self.db is not None :
             self.client_repo = ClientRepository(self.db)
-        # self.client_repo = ClientRepository(db)
     
     def __delete__(self):
         """Cierra la sesión automáticamente cuando se destruye la instancia"""
-        if self.db:
+        if self.db is not None :
             self.db.close()
 
     def create_client(self, **kwargs) -> ClientModel:

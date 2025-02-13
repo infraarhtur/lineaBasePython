@@ -13,5 +13,7 @@ logging:
 
 sqs:
   url-queue-client: "https://sqs.us-east-1.amazonaws.com/142911054234/client-queue"
+  queue-client-name: "client-queue"
+
 url-queue-client: "https://sqs.us-east-1.amazonaws.com/142911054234/client-queue"
 

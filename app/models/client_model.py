@@ -1,15 +1,19 @@
 # app/models/client_model.py
+import uuid
+
+from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import Column, String
 from sqlalchemy.dialects.postgresql import UUID
+
 from app.data.database import Base
-from pydantic import BaseModel, Field, EmailStr
-import uuid
+
 
 class ClientModel(Base):
     """
     Modelo de SQLAlchemy que representa la tabla de clientes en la base de datos.
     """
     __tablename__ = "clients"
+    __table_args__ = {"schema": "public"}
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = Column(String(100), nullable=False)

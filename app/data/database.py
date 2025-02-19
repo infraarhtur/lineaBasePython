@@ -11,7 +11,17 @@ load_dotenv()
 
 # Configuración desde config.yaml
 config = Config("config.yaml")
-DATABASE_URL = config.get("database", "url-postgresql")
+# Detectar si estamos en Docker (variable típica en contenedores)
+# running_in_docker = os.environ.get("RUNNING_IN_DOCKER", "false").lower() == "true"
+
+# Elegir la conexión correcta
+# DATABASE_URL = os.environ["DB_URL_DOCKER"] if running_in_docker else os.environ["DB_URL_LOCAL"]
+# Obtener la URL de la base de datos
+DATABASE_URL = os.getenv("DB_URL")
+SCHEMA = os.getenv("SCHEMA", "public")
+
+print(f"✅ Conectando a la base de datos en: {DATABASE_URL}")  # DEBUG
+
 SCHEMA = config.get("database", "schema") or "public"
 
 # Crear el motor de la base de datos con soporte para esquemas

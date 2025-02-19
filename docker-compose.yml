@@ -4,11 +4,11 @@ services:
   db:
     image: postgres:15
     container_name: linea_base_db
-    restart: always
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1234
-      POSTGRES_DB: postgres
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
       - "5434:5432"  # Puerto externo 5434, pero dentro de Docker sigue siendo 5432
     healthcheck:
@@ -32,8 +32,7 @@ services:
       AWS_DEFAULT_REGION: "us-east-1"
       SQS_QUEUE_CLIENT_URL: "arn:aws:sqs:us-east-1:142911054234:client-queue"
       
-      DB_URL: "postgresql://postgres:1234@db:5432/postgres"  # Cambiado de localhost -> db
-      DB_URL_DOCKER: "postgresql://postgres:1234@db:5432/postgres"  # Cambiado de localhost -> db
+      DB_URL: "postgresql://postgres:1234@db:5432/postgres"  # Cambiado de localhost -> db     
       DB_HOST: "db"  # Nombre del servicio en Docker
       DB_PORT: "5432"
       DB_NAME: "postgres"

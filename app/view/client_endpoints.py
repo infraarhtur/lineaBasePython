@@ -2,6 +2,7 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from app.data.database import get_db
@@ -12,6 +13,15 @@ from app.utils.error_handling import NotFoundError, ValidationError
 from app.workers.scheduler import start_worker
 
 router = APIRouter()
+
+# Configuración de CORS
+router.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permitir todas las solicitudes de cualquier origen
+    allow_credentials=True,
+    allow_methods=["*"],  # Permitir todos los métodos (GET, POST, etc.)
+    allow_headers=["*"],  # Permitir todos los headers
+)
 
 @router.post("/clients/", response_model=ClientSchema, status_code=status.HTTP_201_CREATED)
 def create_client(client: ClientCreateSchema, db: Session = Depends(get_db)):

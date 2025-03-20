@@ -14,5 +14,5 @@ def start_worker():
     """Función para iniciar el scheduler en segundo plano."""
     if not scheduler.running:
         print("[Worker] Iniciando APScheduler (Asíncrono)...")
-        scheduler.add_job(my_scheduled_task, "interval", seconds=30)
+        scheduler.add_job(my_scheduled_task, "interval", seconds=120)
         scheduler.start()

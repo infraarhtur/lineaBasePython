@@ -11,7 +11,16 @@ load_dotenv()
 
 # Configuración desde config.yaml
 config = Config("config.yaml")
-DATABASE_URL = config.get("database", "url-postgresql")
+
+if os.getenv("DB_URL") is not None:
+    DATABASE_URL = os.getenv("DB_URL")
+else:
+     DATABASE_URL = os.getenv("DB_URL_LOCAL")
+
+SCHEMA = os.getenv("SCHEMA", "public")
+
+print(f"✅ Conectando a la base de datos en: {DATABASE_URL}")  # DEBUG
+
 SCHEMA = config.get("database", "schema") or "public"
 
 # Crear el motor de la base de datos con soporte para esquemas

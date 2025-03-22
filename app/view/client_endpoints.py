@@ -14,15 +14,6 @@ from app.workers.scheduler import start_worker
 
 router = APIRouter()
 
-# Configuración de CORS
-router.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Permitir todas las solicitudes de cualquier origen
-    allow_credentials=True,
-    allow_methods=["*"],  # Permitir todos los métodos (GET, POST, etc.)
-    allow_headers=["*"],  # Permitir todos los headers
-)
-
 @router.post("/clients/", response_model=ClientSchema, status_code=status.HTTP_201_CREATED)
 def create_client(client: ClientCreateSchema, db: Session = Depends(get_db)):
     """
@@ -37,7 +28,8 @@ def create_client(client: ClientCreateSchema, db: Session = Depends(get_db)):
     """
     try:
         service = ClientLogic(db)
-        return service.create_client(name=client.name, email=client.email, phone=client.phone)
+        # return service.create_client(name=client.name, email=client.email, phone=client.phone,address=client.address,comment=client.comment)
+        return service.create_client(**client.model_dump())
     except ValidationError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except NotFoundError as ne:

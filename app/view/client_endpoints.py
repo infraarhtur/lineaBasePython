@@ -28,7 +28,8 @@ def create_client(client: ClientCreateSchema, db: Session = Depends(get_db)):
     """
     try:
         service = ClientLogic(db)
-        return service.create_client(name=client.name, email=client.email, phone=client.phone)
+        # return service.create_client(name=client.name, email=client.email, phone=client.phone,address=client.address,comment=client.comment)
+        return service.create_client(**client.model_dump())
     except ValidationError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except NotFoundError as ne:

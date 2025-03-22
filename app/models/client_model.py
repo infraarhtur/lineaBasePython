@@ -19,12 +19,14 @@ class ClientModel(Base):
     name = Column(String(100), nullable=False)
     email = Column(String, unique=True, nullable=False)
     phone = Column(String, nullable=False)
+    address = Column(String, nullable=True)  # ✅ Campo opcional
+    comment = Column(String, nullable=True) # ✅ Campo opcional
 
     def __repr__(self):
         """
         Representación legible del modelo.
         """
-        return f"<ClientModel(id={self.id}, name={self.name}, email={self.email}, phone={self.phone})>"
+        return f"<ClientModel(id={self.id}, name={self.name}, email={self.email}, phone={self.phone},address={self.address}, comment={self.comment})>"
 
 
 class ClientCreateSchema(BaseModel):
@@ -37,7 +39,10 @@ class ClientCreateSchema(BaseModel):
         ..., 
         pattern=r"^\+?[1-9]\d{1,14}$", 
         description="Phone number of the client"
-    )
+    ),
+    address: str | None = Field(None, description="Address of the client")  # Campo opcional
+    comment: str | None = Field(None, description="Comment about the client")  # Campo opcional
+
 
 
 class ClientSchema(ClientCreateSchema):

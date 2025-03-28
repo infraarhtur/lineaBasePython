@@ -8,6 +8,7 @@ ERROR_MISSING_REQUIRED_FIELDS = "Name and email are required fields."
 ERROR_NOT_FOUND = "The requested resource was not found."
 ERROR_VALIDATION = "The provided data is not valid."
 ERROR_INTERNAL_SERVER = "An internal server error occurred. Please try again later."
+ERROR_PRODUCT_NOT_FOUND = "product with ID '{product_id}' not found."
 
 
 # Códigos de estado HTTP

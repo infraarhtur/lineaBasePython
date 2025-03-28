@@ -106,7 +106,7 @@ class ClientLogic:
             raise e
         return clients
 
-    def update_client(self, client_id: str, name: str = None, email: str = None, phone: str = None) -> Optional[ClientModel]: 
+    def update_client(self, client_id: str, name: str = None, email: str = None, phone: str = None, address: str = None,comment: str = None) -> Optional[ClientModel]: 
         """
         Actualiza la información de un cliente.
 
@@ -128,6 +128,11 @@ class ClientLogic:
                     client.email = email
                 if phone:
                     client.phone = phone
+                if address:
+                    client.address = address
+                if comment:
+                    client.comment =comment
+
                 return self.client_repo.save(client)
         except SQLAlchemyError as e:
             if "UNIQUE constraint failed" in str(e.orig):

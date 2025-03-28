@@ -7,8 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import Config
 from app.data.database import Base, engine
-from app.view.client_endpoints import router
 from app.workers.scheduler import start_worker  # Importar el worker
+from app.view.client_endpoints import router as client_router
+from app.view.products_endpoints import router as product_router
 
 # load_dotenv()
 
@@ -34,7 +35,7 @@ app_port = config.get("app", "port", default=8000)
 # Crear la aplicación FastAPI
 app = FastAPI(
     title=app_name,
-    description="A FastAPI-based system for managing clients.",
+    description="A FastAPI-based system for managing clients and products.",
     version=app_version,
 )
 
@@ -47,7 +48,8 @@ app.add_middleware(
 )
 
 # Incluir el router
-app.include_router(router, prefix="/api", tags=["Clients"])
+app.include_router(client_router, prefix="/api/clients", tags=["Clients"])
+app.include_router(product_router, prefix="/api/products", tags=["Products"])
 
 # Iniciar el worker cuando se inicia la aplicación
 @app.on_event("startup")

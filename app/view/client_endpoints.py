@@ -2,7 +2,6 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from app.data.database import get_db
@@ -14,7 +13,7 @@ from app.workers.scheduler import start_worker
 
 router = APIRouter()
 
-@router.post("/clients/", response_model=ClientSchema, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ClientSchema, status_code=status.HTTP_201_CREATED)
 def create_client(client: ClientCreateSchema, db: Session = Depends(get_db)):
     """
     Crea un nuevo cliente.
@@ -39,7 +38,7 @@ def create_client(client: ClientCreateSchema, db: Session = Depends(get_db)):
 
     
 
-@router.get("/clients/", response_model=List[ClientSchema])
+@router.get("/", response_model=List[ClientSchema])
 def get_all_clients(db: Session = Depends(get_db)):
 
     """
@@ -62,7 +61,7 @@ def get_all_clients(db: Session = Depends(get_db)):
         # Captura de errores inesperados o de la base de datos
         raise HTTPException(status_code=500, detail=const.ERROR_INTERNAL_SERVER)
 
-@router.get("/clients/{client_id}", response_model=ClientSchema)
+@router.get("/{client_id}", response_model=ClientSchema)
 def get_client(client_id: str, db: Session = Depends(get_db)):
     """
     Recupera un cliente por su ID.
@@ -89,7 +88,7 @@ def get_client(client_id: str, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=const.ERROR_INTERNAL_SERVER)
 
-@router.put("/clients/{client_id}", response_model=ClientSchema)
+@router.put("/{client_id}", response_model=ClientSchema)
 def update_client(client_id: str, client: ClientCreateSchema, db: Session = Depends(get_db)):
     """
     Actualiza los datos de un cliente.
@@ -109,7 +108,7 @@ def update_client(client_id: str, client: ClientCreateSchema, db: Session = Depe
     try:
         updated_client = service.update_client(
             client_id=client_id, name=client.name, email=client.email, 
-            phone=client.phone
+            phone=client.phone,address=client.address,comment=client.comment
         )        
         return updated_client
     except ValidationError as ve:
@@ -119,7 +118,7 @@ def update_client(client_id: str, client: ClientCreateSchema, db: Session = Depe
     except Exception as e:
         raise HTTPException(status_code=500, detail=const.ERROR_INTERNAL_SERVER)
 
-@router.delete("/clients/{client_id}" ,response_model=bool,
+@router.delete("/{client_id}" ,response_model=bool,
                 status_code=status.HTTP_200_OK)
 def delete_client(client_id: str, db: Session = Depends(get_db)):
     """

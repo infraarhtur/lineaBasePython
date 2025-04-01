@@ -39,3 +39,8 @@ intento que este proyecto me sirva como estudio y guia para otros proyectos
 ```
 # requirements
 
+# comandos docker
+Docker ps -a
+docker logs linea_base_app   
+docker-compose down
+docker-compose up -d --build

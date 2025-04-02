@@ -6,7 +6,7 @@ app:
 
 database:
   url: "sqlite:////Users/arhtur/Bases de datos/lineaBase"
-  url-postgresql:  "postgresql://postgres:1234@localhost:5434/postgres"
+  url-postgresql:  "postgresql://postgres:1234@localhost:5432/postgres"
   schema: "public"
 
 logging:

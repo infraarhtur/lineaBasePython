@@ -10,6 +10,7 @@ from app.data.database import Base, engine
 from app.workers.scheduler import start_worker  # Importar el worker
 from app.view.client_endpoints import router as client_router
 from app.view.products_endpoints import router as product_router
+from app.view.category_endpoints import router as category_router
 
 # load_dotenv()
 
@@ -50,6 +51,7 @@ app.add_middleware(
 # Incluir el router
 app.include_router(client_router, prefix="/api/clients", tags=["Clients"])
 app.include_router(product_router, prefix="/api/products", tags=["Products"])
+app.include_router(category_router, prefix="/api/category", tags=["Categories"])
 
 # Iniciar el worker cuando se inicia la aplicación
 @app.on_event("startup")

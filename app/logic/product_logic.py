@@ -206,3 +206,29 @@ class ProductLogic:
 
         product.stock = stock
         return self.product_repo.save(product)
+    
+    def get_products_by_category(self, category_id: str) -> List[ProductModel]:
+        """
+        Devuelve los productos que pertenecen a una categoría dada.
+
+        Args:
+            category_id (str): ID de la categoría.
+
+        Returns:
+            List[ProductModel]: Productos asociados.
+
+        Raises:
+            ValidationError: Si el ID es inválido.
+            NotFoundError: Si no hay productos asociados.
+        """
+        try:
+            uuid_obj = uuid.UUID(category_id)
+        except ValueError:
+            raise ValidationError("El ID de categoría no es válido.")
+
+        products = self.product_repo.fetch_by_category_id(uuid_obj)
+
+        if not products:
+            raise NotFoundError(f"No hay productos asociados a la categoría {category_id}")
+
+        return products

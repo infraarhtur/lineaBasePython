@@ -175,4 +175,16 @@ def update_product_stock(product_id: str, payload: ProductStockUpdateSchema, db:
         raise HTTPException(status_code=404, detail=str(ne))
     except Exception:
         raise HTTPException(status_code=500, detail=const.ERROR_INTERNAL_SERVER)
+    
+@router.get("/by_category/{category_id}", response_model=List[ProductSchema])
+def get_products_by_category(category_id: str, db: Session = Depends(get_db)):
+    logic = ProductLogic(db)
+    try:
+        return logic.get_products_by_category(category_id)
+    except (ValidationError, NotFoundError) as e:
+        # Captura tus errores personalizados y los convierte en HTTP
+        raise HTTPException(status_code=e.status_code, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail=const.ERROR_INTERNAL_SERVER)
+
 

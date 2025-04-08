@@ -7,6 +7,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session, joinedload
 
+from app.models.category_model import CategoryModel
 from app.models.products_model import ProductModel
 
 
@@ -125,4 +126,29 @@ class ProductRepository:
             return True
         except SQLAlchemyError as e:
             self.db.rollback()  # Revertir la transacción si ocurre un error
+            raise e
+        
+
+    def fetch_by_category_id(self, category_id: uuid.UUID) -> List[ProductModel]:
+        """
+        Obtiene todos los productos asociados a una categoría específica.
+
+        Args:
+            category_id (uuid.UUID): ID de la categoría.
+
+        Returns:
+            List[ProductModel]: Lista de productos.
+        """
+        try:
+            query = (
+                self.db.query(ProductModel)
+                .join(ProductModel.categories)
+                .filter(CategoryModel.id == category_id)
+                
+            )
+            print(query.statement.compile(dialect=postgresql.dialect(),
+                                           compile_kwargs={"literal_binds": True}))
+            return query.all()
+        except SQLAlchemyError as e:
+            self.db.rollback()
             raise e

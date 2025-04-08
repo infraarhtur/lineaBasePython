@@ -41,9 +41,8 @@ def get_db():
         Session: Una sesión activa de SQLAlchemy.
     """
     db = SessionLocal()
+
     try:
         yield db
-    except  Exception as e:
-        print(f'Error de session {e}')
     finally:
         db.close()

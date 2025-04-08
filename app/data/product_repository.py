@@ -5,7 +5,7 @@ import psycopg2
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models.products_model import ProductModel
 
@@ -49,53 +49,60 @@ class ProductRepository:
             raise e
 
         
-
-    def fetch(self, product_id: str) -> ProductModel:
+    def fetch_by_id(self, product_id: uuid.UUID) -> Optional[ProductModel]:
         """
-        Recupera un producto de la base de datos por su ID.
-        
+        Recupera un producto de la base de datos por su ID,
+        incluyendo las categorías asociadas.
+
         Args:
-            product_id (uuid.UUID): ID del producto a buscar.
-        
+            product_id (uuid.UUID): ID del producto.
+
         Returns:
-            ProductModel: producto encontrado o None si no existe.
+            Optional[ProductModel]: Producto encontrado o None.
         """
-        try:       
-            # Si la sesión está en estado inválido, reiniciarla
+        try:
             if self.db.in_transaction():
                 self.db.rollback()
 
-            query = self.db.query(ProductModel).filter(ProductModel.id == product_id)
-            print(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
-           
-            product = query.first()            
+            query = (
+                self.db.query(ProductModel)
+                .options(joinedload(ProductModel.categories))
+                .filter(ProductModel.id == product_id)
+            )
 
-            return product
-        except psycopg2.errors.InFailedSqlTransaction:
-            print("⚠️ Transacción fallida detectada. Reiniciando sesión de base de datos...")
-            self.db.rollback()
-            product = self.db.query(ProductModel).filter(ProductModel.id == product_id).first()
-            return product
+            print("🧪 SQL generado:", query.statement.compile(
+                dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
+
+            return query.first()
+
         except SQLAlchemyError as e:
-            if self.db.in_transaction():
-                self.db.rollback()
+            self.db.rollback()
             print(f"❌ Error SQLAlchemy al recuperar producto con ID {product_id}: {e}")
             raise e
 
     def fetch_all(self) -> List[ProductModel]:
         """
-        Recupera todos los Productos de la base de datos.
-        
-        Returns:
-            List[ProductModel]: Lista de todos los productos.
-        
-        Raises:
-            SQLAlchemyError: Si ocurre un error durante la operación.
-        """
+        Recupera todos los productos de la base de datos,
+        incluyendo sus categorías asociadas.
 
+        Returns:
+            List[ProductModel]: Lista de productos con relaciones cargadas.
+
+        Raises:
+            SQLAlchemyError: Si ocurre un error durante la consulta.
+        """
         try:
-            return self.db.query(ProductModel).all()
+            query = (
+                self.db.query(ProductModel)
+                .options(joinedload(ProductModel.categories))  # Carga categorías en la misma consulta
+                )
+            print(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
+            products = query.all()
+            return products
+
         except SQLAlchemyError as e:
+            self.db.rollback()
+            print(f"❌ Error al obtener todos los productos: {e}")
             raise e
 
     def delete(self, product: ProductModel) -> bool:

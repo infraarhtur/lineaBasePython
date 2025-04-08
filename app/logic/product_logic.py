@@ -1,11 +1,14 @@
 import json
 import uuid
+from datetime import datetime
 from typing import List, Optional
 
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.data.category_repository import CategoryRepository
 from app.data.product_repository import ProductRepository
+from app.models.category_model import CategoryModel
 from app.models.products_model import ProductModel
 from app.services.message_service import MessageService
 from app.utils import constans as const
@@ -28,6 +31,7 @@ class ProductLogic:
         self.db = db
         if self.db is not None :
             self.product_repo = ProductRepository(self.db)
+            self.category_repo = CategoryRepository(self.db)
     
     def __delete__(self):
         """Cierra la sesión automáticamente cuando se destruye la instancia"""
@@ -36,25 +40,46 @@ class ProductLogic:
 
     def create_product(self, **kwargs) -> ProductModel:
         """
-            Crea un nuevo producto.
+        Crea un nuevo producto con sus categorías asociadas.
 
-            Args:
-                **kwargs: Argumentos con las propiedades del producto (excepto el ID).
+        Args:
+            **kwargs: Campos del producto (incluye category_ids opcional).
 
-            Returns:
-                ProductModel: Instancia del producto creado.
+        Returns:
+            ProductModel: Producto creado.
 
-            Raises:
-                ValidationError: Si los datos proporcionados son inválidos.
-                SQLAlchemyError: Si ocurre un error durante la operación en la base de datos.
+        Raises:
+            ValidationError: Si los datos son inválidos.
+            SQLAlchemyError: Si ocurre error en base de datos.
         """
         try:
+            name = kwargs.get("name")
+            category_ids = kwargs.get("category_ids", [])
             # Validar campos obligatorios
-            if not kwargs.get("name"):
+            if not name:
                 raise ValidationError(const.ERROR_MISSING_REQUIRED_FIELDS)
+            
+        # Cargar las categorías si hay IDs
+            categories = []
+            if category_ids:
+                for category_id in category_ids:
+                    category = self.category_repo.fetch(category_id)
+                    if not category:
+                        raise ValidationError(f"Categoría con ID {category_id} no encontrada.")
+                    categories.append(category)
 
-            # Crear instancia del producto
-            product = ProductModel(**kwargs)
+                    # Crear el producto
+            product = ProductModel(
+                name=name,
+                description=kwargs.get("description"),
+                sale_price=kwargs.get("sale_price"),
+                purchase_price=kwargs.get("purchase_price"),
+                stock=kwargs.get("stock"),
+                created_at= datetime.utcnow(),
+                categories=categories  # Asociar categorías
+            )          
+
+            
             return self.product_repo.save(product)
         
         except SQLAlchemyError as e:
@@ -82,12 +107,14 @@ class ProductLogic:
             raise ValidationError(const.ERROR_INVALID_UUID)
         
 
-        try:
-            product = self.product_repo.fetch(product_id)
+        try:            
+            product = self.product_repo.fetch_by_id(product_id)            
+            
         except SQLAlchemyError as e:
             raise e
 
         if not product:
+            product_id = str(product_id)
             raise NotFoundError(const.ERROR_PRODUCT_NOT_FOUND.format(product_id=product_id))
         return product
        
@@ -125,10 +152,20 @@ class ProductLogic:
                 product.description = kwargs.get("description")
                 product.sale_price = kwargs.get("sale_price")
                 product.stock = kwargs.get("stock")
-                product.created_at = kwargs.get("created_at")               
+                product.created_at = kwargs.get("created_at")
+
+            category_ids = kwargs.get("category_ids")
+            if category_ids is not None:
+                categories = []
+            for category_id in category_ids:
+                category = self.category_repo.fetch(category_id)
+                if not category:
+                    raise ValidationError(f"Categoría con ID {category_id} no encontrada.")
+                categories.append(category)
+            product.categories = categories  # Se reemplazan todas las categorías             
 
 
-                return self.product_repo.save(product)
+            return self.product_repo.save(product)
         except SQLAlchemyError as e:            
             raise e
 
@@ -143,9 +180,14 @@ class ProductLogic:
         Returns:
             bool: True si el producto fue eliminado, False si no existe.
         """
+        # Validar que sea un UUID válido
+
         try:
+            
             # Verificar que el producto exista
             product = self.get_product_by_id(str(product_id))
+            # if not product:
+            #     raise NotFoundError(f"Producto con ID {product_id} no encontrado.")
             # Eliminar producto
             return self.product_repo.delete(product)
         except SQLAlchemyError as e:

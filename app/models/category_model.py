@@ -20,12 +20,12 @@ class CategoryModel(Base):
     name = Column(String(100), nullable=False)
     description = Column(String, nullable=True)
 
-    # Relación con productos (muchos a muchos)
-    # products = relationship(
-    #     "ProductModel",
-    #     secondary="public.product_categories",
-    #     back_populates="categories"
-    # )
+    #Relación con productos (muchos a muchos)
+    products = relationship(
+        "ProductModel",
+        secondary="public.product_categories",
+        back_populates="categories"
+    )
 
     def __repr__(self):
         return f"<CategoryModel(id={self.id}, name={self.name}, description={self.description})>"

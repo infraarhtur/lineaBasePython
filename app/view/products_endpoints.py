@@ -6,7 +6,11 @@ from sqlalchemy.orm import Session
 
 from app.data.database import get_db
 from app.logic.product_logic import ProductLogic
-from app.models.products_model import ProductCreateSchema, ProductSchema, ProductStockUpdateSchema
+from app.models.products_model import (
+    ProductCreateSchema,
+    ProductSchema,
+    ProductStockUpdateSchema,
+)
 from app.utils import constans as const
 from app.utils.error_handling import NotFoundError, ValidationError
 from app.workers.scheduler import start_worker
@@ -82,12 +86,16 @@ def delete_product(product_id: str, db: Session = Depends(get_db)):
     logic = ProductLogic(db)
     try:
         return logic.delete_product(product_id)
-    except ValidationError as ve:
-        raise HTTPException(status_code=400, detail=str(ve))
-    except NotFoundError as ne:
-        raise HTTPException(status_code=404, detail=str(ne))
+
+    except (ValidationError, NotFoundError) as e:
+        # Captura tus errores personalizados y los convierte en HTTP
+        raise HTTPException(status_code=e.status_code, detail=str(e))
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=const.ERROR_INTERNAL_SERVER)
+        # Fallback para errores inesperados
+        import traceback
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
     
     
 @router.post("/", response_model=ProductSchema, status_code=status.HTTP_201_CREATED)

@@ -12,7 +12,7 @@ from app.data.database import Base
 
 class ProductModel(Base):
     """
-    Modelo de SQLAlchemy que representa la tabla de productos en la base de datos.
+    Modelo de SQLAlchemy que representa la tabla de productos.
     """
     __tablename__ = "products"
     __table_args__ = {"schema": "public"}
@@ -32,9 +32,27 @@ class ProductModel(Base):
         back_populates="products"
     )
 
+    # Relación con proveedores (muchos a muchos directa)
+    providers = relationship(
+        "ProviderModel",
+        secondary="public.product_providers",
+        back_populates="products",
+        overlaps="product_providers,provider"
+    )
+
+    # Relación con la tabla intermedia (acceso a campos como precio de compra)
+    product_providers = relationship(
+        "ProductProviderModel",
+        back_populates="product",
+        cascade="all, delete-orphan",
+        overlaps="providers,provider"
+    )
+
     def __repr__(self):
-        return (f"<ProductModel(id={self.id}, name={self.name}, description={self.description}, "
-                f"sale_price={self.sale_price}, stock={self.stock}, created_at={self.created_at})>")
+        return (
+            f"<ProductModel(id={self.id}, name={self.name}, description={self.description}, "
+            f"sale_price={self.sale_price}, stock={self.stock}, created_at={self.created_at})>"
+        )
 
 
 # -------------------------------
@@ -42,9 +60,6 @@ class ProductModel(Base):
 # -------------------------------
 
 class ProductCreateSchema(BaseModel):
-    """
-    Esquema para la creación de un producto.
-    """
     name: str = Field(..., min_length=2, max_length=100, description="Nombre del producto")
     description: str = Field(..., description="Descripción del producto")
     sale_price: float = Field(..., description="Precio de venta")
@@ -55,9 +70,6 @@ class ProductCreateSchema(BaseModel):
 
 
 class CategorySchema(BaseModel):
-    """
-    Esquema reducido de categoría usado en ProductSchema.
-    """
     id: uuid.UUID
     name: str
     description: Optional[str]
@@ -66,10 +78,18 @@ class CategorySchema(BaseModel):
         from_attributes = True
 
 
+class ProviderSchema(BaseModel):
+    id: uuid.UUID
+    name: str
+    email: Optional[str]
+    phone: Optional[str]
+    address: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+
 class ProductSchema(BaseModel):
-    """
-    Esquema para representar un producto con un ID y sus categorías.
-    """
     id: uuid.UUID
     name: str
     description: str
@@ -78,14 +98,11 @@ class ProductSchema(BaseModel):
     stock: Optional[int]
     created_at: Optional[datetime]
     categories: Optional[List[CategorySchema]] = []
+    providers: Optional[List[ProviderSchema]] = []
 
     class Config:
         from_attributes = True
 
 
 class ProductStockUpdateSchema(BaseModel):
-    """
-    Esquema para actualización de stock.
-    """
     stock: int = Field(..., description="Cantidad actualizada en inventario")
-

@@ -1,16 +1,17 @@
-# main.py
 import os
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+import app.models
 from app.config import Config
 from app.data.database import Base, engine
-from app.workers.scheduler import start_worker  # Importar el worker
+from app.view.category_endpoints import router as category_router
 from app.view.client_endpoints import router as client_router
 from app.view.products_endpoints import router as product_router
-from app.view.category_endpoints import router as category_router
+from app.view.provider_endpoints import router as provider_router
+from app.workers.scheduler import start_worker  # Importar el worker
 
 # load_dotenv()
 
@@ -52,6 +53,7 @@ app.add_middleware(
 app.include_router(client_router, prefix="/api/clients", tags=["Clients"])
 app.include_router(product_router, prefix="/api/products", tags=["Products"])
 app.include_router(category_router, prefix="/api/category", tags=["Categories"])
+app.include_router(provider_router, prefix="/api/provider", tags=["Providers"])
 
 # Iniciar el worker cuando se inicia la aplicación
 @app.on_event("startup")

@@ -9,6 +9,9 @@ from sqlalchemy.orm import Session, joinedload
 
 from app.models.category_model import CategoryModel
 from app.models.products_model import ProductModel
+from app.models.product_provider_model import ProductProviderModel
+
+
 
 
 class ProductRepository:
@@ -82,24 +85,17 @@ class ProductRepository:
             raise e
 
     def fetch_all(self) -> List[ProductModel]:
-        """
-        Recupera todos los productos de la base de datos,
-        incluyendo sus categorías asociadas.
-
-        Returns:
-            List[ProductModel]: Lista de productos con relaciones cargadas.
-
-        Raises:
-            SQLAlchemyError: Si ocurre un error durante la consulta.
-        """
         try:
             query = (
                 self.db.query(ProductModel)
-                .options(joinedload(ProductModel.categories))  # Carga categorías en la misma consulta
+                .options(
+                    joinedload(ProductModel.categories),
+                    joinedload(ProductModel.providers),
+                    joinedload(ProductModel.product_providers)
                 )
-            print(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
-            products = query.all()
-            return products
+            )
+            print("🧪 SQL:", query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
+            return query.all()
 
         except SQLAlchemyError as e:
             self.db.rollback()

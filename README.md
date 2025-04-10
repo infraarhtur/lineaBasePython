@@ -43,4 +43,26 @@ intento que este proyecto me sirva como estudio y guia para otros proyectos
 Docker ps -a
 docker logs linea_base_app   
 docker-compose down
+
+### elimina con con volumenes 
+docker-compose down --volumes 
+
+###  ver que volumenes existen
+docker volume ls
+
 docker-compose up -d --build
+
+### inspeccionar pgdata
+docker volume inspect pgdata
+
+--------------------------------------------------------------------------------
+Puedes entrar al contenedor de la base de datos:
+docker exec -it linea_base_db bash
+
+Luego accede a PostgreSQL con:
+psql -U postgres -d postgres
+
+
+Y verifica las tablas existentes
+
+\dt

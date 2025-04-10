@@ -1,9 +1,11 @@
+
 import uuid
 from typing import Optional
 
 from pydantic import BaseModel, Field
 from sqlalchemy import Column, String
 from sqlalchemy.dialects.postgresql import UUID as UUIDType
+from sqlalchemy.orm import relationship
 
 from app.data.database import Base
 
@@ -20,6 +22,22 @@ class ProviderModel(Base):
     phone = Column(String(20), nullable=True)
     email = Column(String(100), nullable=True)
     address = Column(String(255), nullable=True)
+
+    # Relación muchos a muchos con productos
+    products = relationship(
+        "ProductModel",
+        secondary="public.product_providers",
+        back_populates="providers",
+        overlaps="product,product_providers"
+    )
+
+    # Relación directa con la tabla intermedia
+    product_providers = relationship(
+        "ProductProviderModel",
+        back_populates="provider",
+        cascade="all, delete-orphan",
+        overlaps="products"
+    )
 
     def __repr__(self):
         return f"<ProviderModel(id={self.id}, name={self.name})>"

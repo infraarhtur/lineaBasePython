@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.data.category_repository import CategoryRepository
 from app.data.product_repository import ProductRepository
+from app.data.provider_repository import ProviderRepository
 from app.models.category_model import CategoryModel
 from app.models.products_model import ProductModel
 from app.services.message_service import MessageService
@@ -32,6 +33,7 @@ class ProductLogic:
         if self.db is not None :
             self.product_repo = ProductRepository(self.db)
             self.category_repo = CategoryRepository(self.db)
+            self.provider_repo = ProviderRepository(self.db)
     
     def __delete__(self):
         """Cierra la sesión automáticamente cuando se destruye la instancia"""
@@ -55,6 +57,7 @@ class ProductLogic:
         try:
             name = kwargs.get("name")
             category_ids = kwargs.get("category_ids", [])
+            providers_ids = kwargs.get("providers_ids", [])
             # Validar campos obligatorios
             if not name:
                 raise ValidationError(const.ERROR_MISSING_REQUIRED_FIELDS)
@@ -67,6 +70,14 @@ class ProductLogic:
                     if not category:
                         raise ValidationError(f"Categoría con ID {category_id} no encontrada.")
                     categories.append(category)
+        # Cargar las provedores  si hay IDs
+            providers = []
+            if providers_ids:
+                for provider_id in providers_ids:
+                    provider = self.provider_repo.fetch(provider_id)
+                    if not provider:
+                        raise ValidationError(f"Proveedor con ID {provider_id} no encontrado.")
+                    providers.append(provider)
 
                     # Crear el producto
             product = ProductModel(
@@ -76,7 +87,8 @@ class ProductLogic:
                 purchase_price=kwargs.get("purchase_price"),
                 stock=kwargs.get("stock"),
                 created_at= datetime.utcnow(),
-                categories=categories  # Asociar categorías
+                categories=categories,  # Asociar categorías
+                providers=providers # Asociar providers
             )          
 
             

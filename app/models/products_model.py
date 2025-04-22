@@ -67,7 +67,7 @@ class ProductCreateSchema(BaseModel):
     stock: Optional[int] = Field(None, description="Cantidad en inventario")
     created_at: Optional[datetime] = Field(None, description="Fecha de creación")
     category_ids: Optional[List[uuid.UUID]] = Field(default_factory=list, description="IDs de categorías asociadas")
-
+    providers_ids: Optional[List[uuid.UUID]] = Field(default_factory=list, description="IDs de proveedores asociadas")
 
 class CategorySchema(BaseModel):
     id: uuid.UUID

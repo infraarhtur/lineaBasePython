@@ -8,10 +8,8 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session, joinedload
 
 from app.models.category_model import CategoryModel
-from app.models.products_model import ProductModel
 from app.models.product_provider_model import ProductProviderModel
-
-
+from app.models.products_model import ProductModel
 
 
 class ProductRepository:
@@ -70,7 +68,9 @@ class ProductRepository:
 
             query = (
                 self.db.query(ProductModel)
-                .options(joinedload(ProductModel.categories))
+                .options(joinedload(ProductModel.categories),                         
+                    joinedload(ProductModel.providers),
+                    joinedload(ProductModel.product_providers))
                 .filter(ProductModel.id == product_id)
             )
 

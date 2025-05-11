@@ -62,8 +62,8 @@ class CategoryRepository:
         """
         try:       
             # Si la sesión está en estado inválido, reiniciarla
-            if self.db.in_transaction():
-                self.db.rollback()
+            # if self.db.in_transaction():
+            #     self.db.rollback()
 
             query = self.db.query(CategoryModel).filter(CategoryModel.id == client_id)
             print(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))

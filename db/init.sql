@@ -93,27 +93,35 @@ ALTER TABLE public.product_providers OWNER TO postgres;
 GRANT ALL ON TABLE public.product_providers TO postgres;
 
 -- Tabla: sales
-CREATE TABLE public.sales (
-	id uuid NOT NULL,
-	client_id uuid NULL,
-	sale_date timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-	CONSTRAINT sales_pkey PRIMARY KEY (id),
-	CONSTRAINT sales_client_id_fkey FOREIGN KEY (client_id) REFERENCES public.clients(id) ON DELETE SET NULL
+CREATE TABLE sales (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), -- Unique sale ID
+    client_id UUID,
+    sale_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total_amount DECIMAL(10,2), -- Total of the sale
+    status TEXT DEFAULT 'pending', -- Status: pending, paid, canceled, etc.
+    payment_method TEXT, -- e.g., 'tarjeta de crédito'
+    comment TEXT, -- Additional notes
+    created_by UUID, -- User who created the sale
+    FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE SET NULL
 );
+
 ALTER TABLE public.sales OWNER TO postgres;
 GRANT ALL ON TABLE public.sales TO postgres;
 
 -- Tabla: sale_details
-CREATE TABLE public.sale_details (
-	id uuid NOT NULL,
-	sale_id uuid NULL,
-	product_id uuid NULL,
-	quantity int4 NOT NULL,
-	unit_price numeric(10, 2) NOT NULL,
-	subtotal numeric(10, 2) NOT NULL,
-	CONSTRAINT sale_details_pkey PRIMARY KEY (id),
-	CONSTRAINT sale_details_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id) ON DELETE CASCADE,
-	CONSTRAINT sale_details_sale_id_fkey FOREIGN KEY (sale_id) REFERENCES public.sales(id) ON DELETE CASCADE
+CREATE TABLE sale_details (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), -- Unique sale detail ID
+    sale_id UUID NOT NULL,
+    product_id UUID NOT NULL,
+    quantity INT NOT NULL CHECK (quantity > 0), -- Or use NUMERIC if fractional quantities are needed
+    discount DECIMAL(10,2) DEFAULT 0.00,
+    tax DECIMAL(10,2) DEFAULT 0.00,
+    subtotal DECIMAL(10,2) NOT NULL, -- Based on quantity * product.sale_price
+    total DECIMAL(10,2), -- subtotal - discount + tax
+    unit_cost DECIMAL(10,2), -- Cost of the product at sale time (optional, for profit analysis)
+    comment TEXT,
+    FOREIGN KEY (sale_id) REFERENCES sales(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 ALTER TABLE public.sale_details OWNER TO postgres;
 GRANT ALL ON TABLE public.sale_details TO postgres;

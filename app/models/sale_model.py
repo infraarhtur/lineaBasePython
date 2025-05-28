@@ -8,6 +8,7 @@ from sqlalchemy.dialects.postgresql import UUID as UUIDType
 from sqlalchemy.orm import relationship
 
 from app.data.database import Base
+from app.models.client_model import ClientSchema
 
 
 class SaleModel(Base):
@@ -32,6 +33,7 @@ class SaleModel(Base):
         back_populates="sale",
         cascade="all, delete-orphan"
     )
+    client = relationship("ClientModel", back_populates="sales")
 
     def __repr__(self):
         return (
@@ -50,8 +52,8 @@ class SaleDetailCreateSchema(BaseModel):
     subtotal: float = Field(..., gt=0, description="Subtotal del producto (sin descuento ni impuestos)")
     total: Optional[float] = Field(None, description="Total con descuento e impuestos")
     unit_cost: Optional[float] = Field(None, description="Costo del producto al momento de la venta")
-    comment: Optional[str] = Field(None, description="Comentario adicional sobre el ítem vendido")
-
+    comment: Optional[str] = Field(None, description="Comentario adicional sobre el ítem vendido")   
+    
 
 # 🔹 Detalle de venta (respuesta)
 class SaleDetailSchema(SaleDetailCreateSchema):
@@ -70,7 +72,8 @@ class SaleCreateSchema(BaseModel):
     payment_method: Optional[str] = Field(None, description="Método de pago (tarjeta, efectivo, etc.)")
     comment: Optional[str] = Field(None, description="Comentario adicional sobre la venta")
     created_by: Optional[uuid.UUID] = Field(None, description="ID del usuario que creó la venta")
-
+    #cliente
+    client: Optional[ClientSchema] = Field(..., description="Detalles del cliente")
     # Lista de productos vendidos
     details: List[SaleDetailCreateSchema] = Field(..., description="Lista de productos vendidos en la venta")
 
@@ -90,7 +93,7 @@ class SaleUpdateSchema(BaseModel):
 class SaleSchema(SaleCreateSchema):
     id: uuid.UUID = Field(..., description="ID de la venta")
     details: List[SaleDetailSchema] = Field(..., description="Detalles de la venta")
-
+    client: Optional[ClientSchema] = Field(..., description="Detalles del cliente")
     class Config:
         from_attributes = True
 

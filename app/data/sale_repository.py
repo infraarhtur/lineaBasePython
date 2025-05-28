@@ -1,12 +1,14 @@
 import uuid
 from typing import List, Optional
 
-# from app.models.sale_model import SaleDetailModel  # Asegúrate de tenerlo
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import UUID
 
+# from app.models.sale_model import SaleDetailModel  # Asegúrate de tenerlo
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session, joinedload
+
+from app.models.client_model import ClientModel
 from app.models.sale_model import SaleModel
 
 
@@ -21,8 +23,8 @@ class SaleRepository:
         self.db.refresh(sale)
         return sale
 
-    def get_all(self) -> List[SaleModel]:
-        query =self.db.query(SaleModel)
+    def get_all(self) -> List[SaleModel]: 
+        query = self.db.query(SaleModel).options(joinedload(SaleModel.client))
         print(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
         return query.all()
 

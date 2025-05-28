@@ -4,6 +4,7 @@ import uuid
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import Column, String
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 
 from app.data.database import Base
 
@@ -22,6 +23,7 @@ class ClientModel(Base):
     address = Column(String, nullable=True)  # ✅ Campo opcional
     comment = Column(String, nullable=True) # ✅ Campo opcional
 
+    sales = relationship("SaleModel", back_populates="client")
     def __repr__(self):
         """
         Representación legible del modelo.

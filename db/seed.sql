@@ -41,7 +41,7 @@ INSERT INTO public.product_providers (product_id, provider_id, purchase_price, d
 INSERT INTO public.sales
 (id, client_id, sale_date, total_amount, status, payment_method, "comment", created_by)
 VALUES (
-    uuid_generate_v4(), -- id
+    'c3135910-3b90-4894-9c96-8c39516694fa', -- id
     '276dfbcf-8523-4d08-ba5b-edadf448b65f', -- client_id
     CURRENT_TIMESTAMP, -- sale_date
     30000, -- total_amount

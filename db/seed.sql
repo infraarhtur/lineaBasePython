@@ -10,7 +10,7 @@ INSERT INTO public.products (id, "name", description, purchase_price, sale_price
 VALUES('0748801f-1386-45c2-9f01-51a639095da0',	'este es el segundo producto',	'este es un producto nuevo',	15000.00,	20000.00,	5,	CURRENT_TIMESTAMP);
 
 -- clients --
-
+INSERT INTO public.clients (id, "name", email, phone, address, "comment") VALUES('594045b6-3259-471d-aac2-c2a24163677c'::uuid, 'unknown', 'unknown@gmail.com', '0000000', 'unknown', 'unknown cliente generico');
 INSERT INTO public.clients (id, "name", email, phone, address, "comment") VALUES('edbee6f4-5dd7-4ed3-a9f5-113316a6e26e'::uuid, 'prueba2 xxx', 'prueba1@example.com', '+1234567890', 'avenida siempre viva 123', 'este es un usuario de prueba 2');
 INSERT INTO public.clients (id, "name", email, phone, address, "comment") VALUES('276dfbcf-8523-4d08-ba5b-edadf448b65f'::uuid, 'cliente 1', 'prueba@example.com', '+1234567890', 'avenida siempre viva 123', 'este es un usuario de prueba 2');
 

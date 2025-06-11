@@ -34,5 +34,5 @@ class SaleDetailModel(Base):
     def __repr__(self):
         return (
             f"<SaleDetailModel(id={self.id}, sale_id={self.sale_id}, product_id={self.product_id}, "
-            f"quantity={self.quantity}, subtotal={self.subtotal}, total={self.total})>"
+            f"quantity={self.quantity}, subtotal={self.subtotal}, total={self.total}, name={self.product.name if self.product else 'N/A'})>"
         )

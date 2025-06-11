@@ -9,6 +9,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, joinedload
 
 from app.models.client_model import ClientModel
+from app.models.sale_details_model import SaleDetailModel
 from app.models.sale_model import SaleModel
 
 
@@ -28,10 +29,11 @@ class SaleRepository:
         print(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
         return query.all()
 
-
     def get_by_id(self, sale_id: uuid.UUID) -> Optional[SaleModel]:
-        
-        query =self.db.query(SaleModel).filter(SaleModel.id == sale_id)
+        query = self.db.query(SaleModel).options(
+            joinedload(SaleModel.details).joinedload(SaleDetailModel.product),
+            joinedload(SaleModel.client)
+        ).filter(SaleModel.id == sale_id)
         print(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
         return query.first()
 

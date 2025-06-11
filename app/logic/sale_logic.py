@@ -4,6 +4,7 @@ from uuid import UUID
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from app.data.product_repository import ProductRepository
 from app.data.sale_repository import SaleRepository
 from app.models.sale_details_model import SaleDetailModel
 
@@ -14,15 +15,20 @@ from app.models.sale_model import SaleCreateSchema, SaleModel, SaleUpdateSchema
 class SaleLogic:
     def __init__(self, db: Session):
         self.db = db
-        self.sale_repo = SaleRepository(db)
-
-
+        self.sale_repo = SaleRepository(db) 
+        self.product_repo = ProductRepository(self.db)  
 
     def get_all_sales(self):
         return self.sale_repo.get_all()
 
     def get_sale_by_id(self, sale_id: UUID):
-        return self.sale_repo.get_by_id(sale_id)
+        sale = self.sale_repo.get_by_id(sale_id)
+        if not sale:
+            return None
+        
+        for detail in sale.details:
+            detail.product_name = detail.product.name if detail.product else "Producto no encontrado"
+        return sale
 
     def delete_sale(self, sale_id: UUID) -> bool:
         sale = self.sale_repo.get_by_id(sale_id)

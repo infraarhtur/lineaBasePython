@@ -52,12 +52,12 @@ class SaleDetailCreateSchema(BaseModel):
     subtotal: float = Field(..., gt=0, description="Subtotal del producto (sin descuento ni impuestos)")
     total: Optional[float] = Field(None, description="Total con descuento e impuestos")
     unit_cost: Optional[float] = Field(None, description="Costo del producto al momento de la venta")
-    comment: Optional[str] = Field(None, description="Comentario adicional sobre el ítem vendido")   
-    
+    comment: Optional[str] = Field(None, description="Comentario adicional sobre el ítem vendido") 
 
 # 🔹 Detalle de venta (respuesta)
 class SaleDetailSchema(SaleDetailCreateSchema):
     id: uuid.UUID = Field(..., description="ID del detalle de venta")
+    product_name: Optional[str] = Field(None, description="Nombre del producto")
 
     class Config:
         from_attributes = True

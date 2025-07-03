@@ -63,6 +63,10 @@ class SaleLogic:
                 )
                 sale.details.append(sale_detail)
 
+            # Validar los productos y actualizar el stock
+            self.validate_and_update_stock(sale.details, self.product_repo)           
+
+            # Guardar la venta y sus detalles
             response = self.sale_repo.save(sale)
             return response
 
@@ -101,3 +105,28 @@ class SaleLogic:
         except:
             self.db.rollback()
             raise
+
+    def validate_and_update_stock(details, product_repo: ProductRepository) -> None:
+        """
+        Función de ayuda para validar y actualizar el stock de productos de una venta.
+        
+        Args:
+            sale (Sale): El objeto de venta con los detalles.
+            product_repo (ProductRepository): El repositorio de productos para interactuar con los datos.
+        
+        Raises:
+            ValueError: Si un producto no se encuentra o el stock es insuficiente.
+        """
+        for detail in details:
+            product = product_repo.fetch_by_id(detail.product_id)
+            
+            if not product:
+                raise ValueError(f"Producto con ID {detail.product_id} no encontrado.")
+            
+            if product.stock < detail.quantity:
+                raise ValueError(f"Stock insuficiente para el producto {product.name}. Stock actual: {product.stock}, Cantidad solicitada: {detail.quantity}")
+            
+            product.stock -= detail.quantity
+            product_repo.save(product)
+
+        print("Stock actualizado exitosamente.")

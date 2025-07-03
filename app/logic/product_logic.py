@@ -145,51 +145,7 @@ class ProductLogic:
             raise e
         return products
 
-    # def update_product(self,product_id, **kwargs) -> Optional[ProductModel]: 
-    #     """
-    #     Actualiza la información de un producto.
 
-    #     Args:
-    #         product_id (str): ID del producto a actualizar.
-    #         name (Optional[str]): Nuevo nombre del producto (opcional).            
-
-    #     Returns:
-    #         Optional[ProductModel]: producto actualizado o None si no se encontró.
-    #     """
-    #     try:
-    #         product =self.get_product_by_id(product_id)
-            
-    #         if product:
-    #             product.name = kwargs.get("name")
-    #             product.description = kwargs.get("description")
-    #             product.sale_price = kwargs.get("sale_price")
-    #             product.stock = kwargs.get("stock")
-    #             product.created_at =datetime.now()
-
-    #         category_ids = kwargs.get("category_ids")
-    #         if category_ids is not None:
-    #             categories = []
-    #         for category_id in category_ids:
-    #             category = self.category_repo.fetch(category_id)
-    #             if not category:
-    #                 raise ValidationError(f"Categoría con ID {category_id} no encontrada.")
-    #             categories.append(category)
-    #         product.categories = categories  # Se reemplazan todas las categorías  
-
-    #         providers_ids = kwargs.get("providers_ids")
-    #         if providers_ids is not None:
-    #             providers = []
-    #         for provider_id in providers_ids:
-    #             provider = self.provider_repo.fetch(provider_id)
-    #             if not provider:
-    #                 raise ValidationError(f"provider con ID {provider_id} no encontrada.")
-    #             providers.append(provider)
-    #         product.providers = providers  # Se reemplazan todos los providers             
-
-
-    #         return self.product_repo.save(product)
-    #     except SQLAlchemyError as e:            
-    #         raise e
     def update_product(self,product_id, **kwargs) -> Optional[ProductModel]: 
         """
         Actualiza la información de un producto.
@@ -309,3 +265,28 @@ class ProductLogic:
             raise NotFoundError(f"No hay productos asociados a la categoría {category_id}")
 
         return products
+    
+    def verify_stock_by_product_id(self, product_id: str, quantity: int) -> bool:
+        """
+        Verifica si hay suficiente stock para un producto dado.
+
+        Args:
+            product_id (str): ID del producto.
+            quantity (int): Cantidad a verificar.
+
+        Returns:
+            bool: True si hay suficiente stock, False en caso contrario.
+
+        Raises:
+            ValidationError: Si el ID es inválido o la cantidad es negativa.
+            NotFoundError: Si el producto no existe.
+        """
+        if quantity < 0:
+            raise ValidationError("La cantidad no puede ser negativa.")
+
+        product = self.get_product_by_id(product_id)
+
+        if not product:
+            raise NotFoundError(f"Producto con ID {product_id} no encontrado.")
+
+        return product.stock >= quantity

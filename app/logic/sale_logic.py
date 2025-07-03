@@ -106,7 +106,7 @@ class SaleLogic:
             self.db.rollback()
             raise
 
-    def validate_and_update_stock(details, product_repo: ProductRepository) -> None:
+    def validate_and_update_stock(self,details, product_repo: ProductRepository) -> None:
         """
         Función de ayuda para validar y actualizar el stock de productos de una venta.
         

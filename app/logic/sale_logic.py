@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 
 from app.data.product_repository import ProductRepository
 from app.data.sale_repository import SaleRepository
+from app.logic.product_logic import ProductLogic
+
 from app.models.sale_details_model import SaleDetailModel
 
 # from app.models.sale_schema import SaleCreateSchema
@@ -17,6 +19,7 @@ class SaleLogic:
         self.db = db
         self.sale_repo = SaleRepository(db) 
         self.product_repo = ProductRepository(self.db)  
+        self.product_logic = ProductLogic(self.db)
 
     def get_all_sales(self):
         return self.sale_repo.get_all()
@@ -98,6 +101,9 @@ class SaleLogic:
             sale.created_by = update_data.created_by
 
         try:
+            if sale.status == "canceled":
+                # Si la venta está cancelada, devolver el stock de los productos
+                self.validate_sale_status_is_cancelled(sale.status, sale.id)
             # self.db.commit()
             # self.db.refresh(sale)
             response = self.sale_repo.save(sale)
@@ -130,3 +136,30 @@ class SaleLogic:
             product_repo.save(product)
 
         print("Stock actualizado exitosamente.")
+
+    def validate_sale_status_is_cancelled(self, statusSale , idSale) -> bool:
+        """
+        Verifica si el estado de la venta es 'cancelled'.
+        y devolverá el stock de los productos a su cantidad original.
+        
+        Args:
+            sale (statusSale): El estado de la venta .
+            idSale (UUID): El ID de la venta.
+        
+        Returns:
+            bool: True si todos los stock fueron devueltos a los productos.
+        """
+        if statusSale == 'canceled':
+            sale = self.sale_repo.get_by_id(idSale)
+            for detail in sale.details:
+                product = self.product_repo.fetch_by_id(detail.product_id)
+                if product:
+                    product.stock += detail.quantity
+                    self.product_logic.update_product_stock(str(product.id), product.stock)
+            print("Stock devuelto exitosamente.")
+            return True
+        else:
+            raise ValueError("El estado de la venta no es 'cancelled'. No se puede devolver el stock.")
+
+
+        

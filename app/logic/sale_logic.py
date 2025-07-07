@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 from app.data.product_repository import ProductRepository
 from app.data.sale_repository import SaleRepository
 from app.logic.product_logic import ProductLogic
-
 from app.models.sale_details_model import SaleDetailModel
 
 # from app.models.sale_schema import SaleCreateSchema
@@ -104,6 +103,7 @@ class SaleLogic:
             if sale.status == "canceled":
                 # Si la venta está cancelada, devolver el stock de los productos
                 self.validate_sale_status_is_cancelled(sale.status, sale.id)
+                sale.status = "canceled"
             # self.db.commit()
             # self.db.refresh(sale)
             response = self.sale_repo.save(sale)

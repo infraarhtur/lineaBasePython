@@ -63,8 +63,8 @@ class ProductRepository:
             Optional[ProductModel]: Producto encontrado o None.
         """
         try:
-            if self.db.in_transaction():
-                self.db.rollback()
+            # if self.db.in_transaction():
+            #     self.db.rollback()
 
             query = (
                 self.db.query(ProductModel)

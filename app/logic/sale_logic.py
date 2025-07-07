@@ -103,7 +103,6 @@ class SaleLogic:
             if sale.status == "canceled":
                 # Si la venta está cancelada, devolver el stock de los productos
                 self.validate_sale_status_is_cancelled(sale.status, sale.id)
-                sale.status = "canceled"
             # self.db.commit()
             # self.db.refresh(sale)
             response = self.sale_repo.save(sale)
@@ -150,8 +149,8 @@ class SaleLogic:
             bool: True si todos los stock fueron devueltos a los productos.
         """
         if statusSale == 'canceled':
-            sale = self.sale_repo.get_by_id(idSale)
-            for detail in sale.details:
+            saleValidate = self.sale_repo.get_by_id(idSale)
+            for detail in saleValidate.details:
                 product = self.product_repo.fetch_by_id(detail.product_id)
                 if product:
                     product.stock += detail.quantity

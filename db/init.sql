@@ -22,11 +22,13 @@ CREATE TABLE public.categories (
 	id uuid NOT NULL,
 	"name" text NOT NULL,
 	description text NULL,
+	is_active bool DEFAULT true NULL,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP NULL,
+	updated_at timestamp NULL,
+	created_by uuid NULL,
 	CONSTRAINT categories_name_key UNIQUE (name),
 	CONSTRAINT categories_pkey PRIMARY KEY (id)
 );
-ALTER TABLE public.categories OWNER TO postgres;
-GRANT ALL ON TABLE public.categories TO postgres;
 
 -- Tabla: clients
 CREATE TABLE public.clients (
@@ -36,6 +38,10 @@ CREATE TABLE public.clients (
 	phone varchar NOT NULL,
 	address text NULL,
 	"comment" text NULL,
+	is_active bool DEFAULT true NULL,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP NULL,
+	updated_at timestamp NULL,
+	created_by uuid NULL,
 	CONSTRAINT clients_email_key UNIQUE (email),
 	CONSTRAINT clients_pkey PRIMARY KEY (id)
 );
@@ -50,7 +56,10 @@ CREATE TABLE public.products (
 	purchase_price numeric(10, 2) NOT NULL,
 	sale_price numeric(10, 2) NOT NULL,
 	stock int4 NOT NULL,
-	created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP NULL,
+	is_active bool DEFAULT true NULL,
+	updated_at timestamp NULL,
+	created_by uuid NULL,
 	CONSTRAINT products_pkey PRIMARY KEY (id)
 );
 ALTER TABLE public.products OWNER TO postgres;
@@ -63,6 +72,10 @@ CREATE TABLE public.providers (
 	phone text NULL,
 	email text NULL,
 	address text NULL,
+	is_active bool DEFAULT true NULL,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP NULL,
+	updated_at timestamp NULL,
+	created_by uuid NULL,
 	CONSTRAINT providers_pkey PRIMARY KEY (id)
 );
 ALTER TABLE public.providers OWNER TO postgres;
@@ -100,7 +113,10 @@ CREATE TABLE sales (
     total_amount DECIMAL(10,2), -- Total of the sale
     status TEXT DEFAULT 'pending', -- Status: pending, paid, canceled, etc.
     payment_method TEXT, -- e.g., 'tarjeta de crédito'
-    comment TEXT, -- Additional notes
+    comment TEXT, -- Additional notes	
+	is_active bool DEFAULT true NULL,
+	created_at timestamp DEFAULT CURRENT_TIMESTAMP NULL,
+	updated_at timestamp NULL,
     created_by UUID, -- User who created the sale
     FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE SET NULL
 );

@@ -3,8 +3,9 @@ from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
-from sqlalchemy import Column, DateTime, Float, Integer, String
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String
 from sqlalchemy.dialects.postgresql import UUID as UUIDType
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from app.data.database import Base
@@ -24,6 +25,10 @@ class ProductModel(Base):
     purchase_price = Column(Float, nullable=False)
     stock = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    is_active = Column(Boolean, default=True, nullable=True)
+    updated_at = Column(DateTime, nullable=True)
+    created_by = Column(UUID(as_uuid=True), nullable=True)
+
 
     # Relación con categorías (muchos a muchos)
     categories = relationship(
@@ -51,7 +56,7 @@ class ProductModel(Base):
     def __repr__(self):
         return (
             f"<ProductModel(id={self.id}, name={self.name}, description={self.description}, "
-            f"sale_price={self.sale_price}, stock={self.stock}, created_at={self.created_at})>"
+            f"sale_price={self.sale_price}, stock={self.stock}, created_at={self.created_at}, is_active={self.is_active})>"
         )
 
 
@@ -68,6 +73,7 @@ class ProductCreateSchema(BaseModel):
     created_at: Optional[datetime] = Field(None, description="Fecha de creación")
     category_ids: Optional[List[uuid.UUID]] = Field(default_factory=list, description="IDs de categorías asociadas")
     providers_ids: Optional[List[uuid.UUID]] = Field(default_factory=list, description="IDs de proveedores asociadas")
+    is_active: bool = Field(True, description="Indicates if the client is active")
 
 class CategorySchema(BaseModel):
     id: uuid.UUID
@@ -96,7 +102,8 @@ class ProductSchema(BaseModel):
     sale_price: float
     purchase_price: float
     stock: Optional[int]
-    created_at: Optional[datetime]
+    is_active: bool = Field(True, description="Indicates if the product is active")
+    created_at: Optional[datetime]    
     categories: Optional[List[CategorySchema]] = []
     providers: Optional[List[ProviderSchema]] = []
 

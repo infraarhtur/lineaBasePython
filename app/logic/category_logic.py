@@ -148,8 +148,9 @@ class CategoryLogic:
         try:
             # Verificar que el categorye exista
             category = self.get_category_by_id(str(category_id))
+            category.is_active = False  # Marcar como inactivo en lugar de eliminar físicamente
             # Eliminar categorye
-            return self.category_repo.delete(category)
+            return self.category_repo.save(category)
         except SQLAlchemyError as e:
             raise e
 

@@ -89,9 +89,7 @@ class ProductLogic:
                 created_at= datetime.utcnow(),
                 categories=categories,  # Asociar categorías
                 providers=providers # Asociar providers
-            )          
-
-            
+            )  
             return self.product_repo.save(product)
         
         except SQLAlchemyError as e:
@@ -172,6 +170,8 @@ class ProductLogic:
                 product.sale_price = kwargs["sale_price"]
             if "stock" in kwargs:
                 product.stock = kwargs["stock"]
+            if "purchase_price" in kwargs:
+                product.purchase_price = kwargs["purchase_price"]
             # product.created_at = datetime.now()  # Esto usualmente es "updated_at"
 
             # Actualizar categorías si vienen en kwargs
@@ -219,10 +219,12 @@ class ProductLogic:
             
             # Verificar que el producto exista
             product = self.get_product_by_id(str(product_id))
-            # if not product:
-            #     raise NotFoundError(f"Producto con ID {product_id} no encontrado.")
+            
             # Eliminar producto
-            return self.product_repo.delete(product)
+            # return self.product_repo.delete(product) 
+            product.is_active = False  # Marcar como inactivo en lugar de eliminar físicamente
+            self.product_repo.save(product)
+            return True
         except SQLAlchemyError as e:
             raise e
 

@@ -93,7 +93,7 @@ class ProductRepository:
                     joinedload(ProductModel.providers),
                     joinedload(ProductModel.product_providers)
                 )
-            )
+            ).filter(ProductModel.is_active == True)  # Filtrar solo productos activos
             print("🧪 SQL:", query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
             return query.all()
 

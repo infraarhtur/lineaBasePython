@@ -1,9 +1,10 @@
 
 import uuid
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, Field
-from sqlalchemy import Column, String
+from sqlalchemy import UUID, Boolean, Column, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID as UUIDType
 from sqlalchemy.orm import relationship
 
@@ -22,6 +23,10 @@ class ProviderModel(Base):
     phone = Column(String(20), nullable=True)
     email = Column(String(100), nullable=True)
     address = Column(String(255), nullable=True)
+    is_active = Column(Boolean, default=True, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=True)
+    updated_at = Column(DateTime, nullable=True)
+    created_by = Column(UUID(as_uuid=True), nullable=True)
 
     # Relación muchos a muchos con productos
     products = relationship(
@@ -40,7 +45,7 @@ class ProviderModel(Base):
     )
 
     def __repr__(self):
-        return f"<ProviderModel(id={self.id}, name={self.name})>"
+        return f"<ProviderModel(id={self.id}, name={self.name}, is_active={self.is_active}, created_at={self.created_at})>"
 
 
 # ----------------------------
@@ -52,6 +57,11 @@ class ProviderCreateSchema(BaseModel):
     phone: Optional[str] = Field(None, description="Número de teléfono")
     email: Optional[str] = Field(None, description="Correo electrónico")
     address: Optional[str] = Field(None, description="Dirección del proveedor")
+    is_active: bool = Field(True, description="Indica si el proveedor está activo")
+    created_at: Optional[datetime] = Field(
+        default_factory=datetime.utcnow,
+        description="Fecha y hora de creación del proveedor"
+    )
 
 
 class ProviderSchema(ProviderCreateSchema):

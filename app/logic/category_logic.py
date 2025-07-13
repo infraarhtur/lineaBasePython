@@ -150,7 +150,8 @@ class CategoryLogic:
             category = self.get_category_by_id(str(category_id))
             category.is_active = False  # Marcar como inactivo en lugar de eliminar físicamente
             # Eliminar categorye
-            return self.category_repo.save(category)
+            self.category_repo.save(category)
+            return True
         except SQLAlchemyError as e:
             raise e
 

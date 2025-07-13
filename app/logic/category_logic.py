@@ -119,14 +119,14 @@ class CategoryLogic:
             Optional[CategoryModel]: Cliente actualizado o None si no se encontró.
         """
         try:
+
             category =self.get_category_by_id(category_id)
             
             if category:
                 if kwargs.get("name"):
                     category.name = kwargs.get("name")
                 if kwargs.get("description"):
-                    category.description = kwargs.get("name")
-                
+                    category.description = kwargs.get("description")               
 
                 return self.category_repo.save(category)
         except SQLAlchemyError as e:

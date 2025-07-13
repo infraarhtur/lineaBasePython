@@ -84,7 +84,8 @@ class ClientRepository:
 
     def fetch_all(self) -> List[ClientModel]:
         """
-        Recupera todos los clientes de la base de datos.
+        Recupera todos los clientes de la base de datos
+        si son activos (is_active = True)   .
         
         Returns:
             List[ClientModel]: Lista de todos los clientes.
@@ -94,7 +95,9 @@ class ClientRepository:
         """
 
         try:
-            return self.db.query(ClientModel).all()
+            query = self.db.query(ClientModel).filter(ClientModel.is_active == True)
+            return query.all()
+
         except SQLAlchemyError as e:
             raise e
 

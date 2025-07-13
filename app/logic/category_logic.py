@@ -119,14 +119,14 @@ class CategoryLogic:
             Optional[CategoryModel]: Cliente actualizado o None si no se encontró.
         """
         try:
+
             category =self.get_category_by_id(category_id)
             
             if category:
                 if kwargs.get("name"):
                     category.name = kwargs.get("name")
                 if kwargs.get("description"):
-                    category.description = kwargs.get("name")
-                
+                    category.description = kwargs.get("description")               
 
                 return self.category_repo.save(category)
         except SQLAlchemyError as e:
@@ -148,8 +148,10 @@ class CategoryLogic:
         try:
             # Verificar que el categorye exista
             category = self.get_category_by_id(str(category_id))
+            category.is_active = False  # Marcar como inactivo en lugar de eliminar físicamente
             # Eliminar categorye
-            return self.category_repo.delete(category)
+            self.category_repo.save(category)
+            return True
         except SQLAlchemyError as e:
             raise e
 

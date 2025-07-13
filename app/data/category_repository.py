@@ -94,7 +94,8 @@ class CategoryRepository:
         """
 
         try:
-            return self.db.query(CategoryModel).all()
+            query = self.db.query(CategoryModel).filter(CategoryModel.is_active == True)  # Filtrar solo los activos
+            return query.all()
         except SQLAlchemyError as e:
             raise e
 

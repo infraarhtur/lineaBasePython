@@ -132,6 +132,7 @@ class ClientLogic:
                     client.address = address
                 if comment:
                     client.comment =comment
+                
 
                 return self.client_repo.save(client)
         except SQLAlchemyError as e:
@@ -153,8 +154,10 @@ class ClientLogic:
         try:
             # Verificar que el cliente exista
             client = self.get_client_by_id(str(client_id))
+            client.is_active = False  # Marcar como inactivo en lugar de eliminar físicamente
             # Eliminar cliente
-            return self.client_repo.delete(client)
+            self.client_repo.save(client)
+            return True
         except SQLAlchemyError as e:
             raise e
 

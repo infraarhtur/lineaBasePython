@@ -1,8 +1,9 @@
 # app/models/client_model.py
 import uuid
+from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, Field
-from sqlalchemy import Column, String
+from sqlalchemy import Boolean, Column, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -22,13 +23,17 @@ class ClientModel(Base):
     phone = Column(String, nullable=False)
     address = Column(String, nullable=True)  # ✅ Campo opcional
     comment = Column(String, nullable=True) # ✅ Campo opcional
+    is_active = Column(Boolean, default=True, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=True)
+    updated_at = Column(DateTime, nullable=True)
+    created_by = Column(UUID(as_uuid=True), nullable=True)
 
     sales = relationship("SaleModel", back_populates="client")
     def __repr__(self):
         """
         Representación legible del modelo.
         """
-        return f"<ClientModel(id={self.id}, name={self.name}, email={self.email}, phone={self.phone},address={self.address}, comment={self.comment})>"
+        return f"<ClientModel(id={self.id}, name={self.name}, email={self.email}, phone={self.phone},address={self.address}, comment={self.comment}, is_active={self.is_active}, created_at={self.created_at})>"
 
 
 class ClientCreateSchema(BaseModel):
@@ -44,7 +49,11 @@ class ClientCreateSchema(BaseModel):
     ),
     address: str | None = Field(None, description="Address of the client")  # Campo opcional
     comment: str | None = Field(None, description="Comment about the client")  # Campo opcional
-
+    is_active: bool = Field(True, description="Indicates if the client is active")
+    created_at: datetime | None = Field(
+        default_factory=datetime.utcnow, 
+        description="Timestamp when the client was created"
+    )
 
 
 class ClientSchema(ClientCreateSchema):

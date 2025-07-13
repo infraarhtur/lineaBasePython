@@ -1,8 +1,9 @@
+from datetime import datetime
 import uuid
 from typing import Optional
 
 from pydantic import BaseModel, Field
-from sqlalchemy import Column, String
+from sqlalchemy import Boolean, Column, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -19,6 +20,10 @@ class CategoryModel(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = Column(String(100), nullable=False)
     description = Column(String, nullable=True)
+    is_active = Column(Boolean, default=True, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=True)
+    updated_at = Column(DateTime, nullable=True)
+    created_by = Column(UUID(as_uuid=True), nullable=True)
 
     #Relación con productos (muchos a muchos)
     products = relationship(
@@ -28,7 +33,7 @@ class CategoryModel(Base):
     )
 
     def __repr__(self):
-        return f"<CategoryModel(id={self.id}, name={self.name}, description={self.description})>"
+        return f"<CategoryModel(id={self.id}, name={self.name}, description={self.description}, is_active={self.is_active}, created_at={self.created_at})>"
 
 
 class CategoryCreateSchema(BaseModel):
@@ -37,7 +42,11 @@ class CategoryCreateSchema(BaseModel):
     """
     name: str = Field(..., min_length=2, max_length=100, description="Nombre de la categoría")
     description: Optional[str] = Field(None, description="Descripción de la categoría")
-
+    is_active: bool = Field(True, description="Indicates if the category is active")
+    created_at: datetime | None = Field(
+        default_factory=datetime.utcnow, 
+        description="Timestamp when the category was created"
+    )
 
 class CategorySchema(CategoryCreateSchema):
     """

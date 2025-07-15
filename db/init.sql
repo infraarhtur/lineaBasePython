@@ -111,6 +111,7 @@ CREATE TABLE sales (
     client_id UUID,
     sale_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     total_amount DECIMAL(10,2), -- Total of the sale
+	total_discount numeric(10, 2) DEFAULT 0.00 NULL,
     status TEXT DEFAULT 'pending', -- Status: pending, paid, canceled, etc.
     payment_method TEXT, -- e.g., 'tarjeta de crédito'
     comment TEXT, -- Additional notes	

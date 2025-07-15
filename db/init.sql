@@ -142,3 +142,36 @@ CREATE TABLE sale_details (
 );
 ALTER TABLE public.sale_details OWNER TO postgres;
 GRANT ALL ON TABLE public.sale_details TO postgres;
+
+--FUNCTIONs
+-- Función para obtener el resumen de ventas por método de pago
+CREATE OR REPLACE FUNCTION public.get_sales_summary_by_payment_method(
+    start_date DATE,
+    end_date DATE
+)
+RETURNS TABLE (
+    payment_method_label TEXT,
+    total_sales INTEGER,
+    total_amount NUMERIC(10,2),
+    total_discount NUMERIC(10,2)
+)
+LANGUAGE SQL
+AS $$
+    SELECT
+        COALESCE(payment_method, 'Grand Total') AS payment_method_label,
+        COUNT(*) AS total_sales,
+        SUM(total_amount) AS total_amount,
+        SUM(total_discount) AS total_discount
+    FROM public.sales
+    WHERE sale_date >= start_date
+      AND sale_date < end_date
+      AND is_active = TRUE
+      AND status = 'paid'
+    GROUP BY GROUPING SETS (
+        (payment_method),
+        ()
+    )
+    ORDER BY
+        CASE WHEN payment_method IS NULL THEN 1 ELSE 0 END,
+        payment_method_label;
+$$;

@@ -45,6 +45,7 @@ class SaleLogic:
                 client_id=sale_data.client_id,
                 sale_date=sale_data.sale_date,
                 total_amount=sale_data.total_amount,
+                total_discount=sale_data.total_discount,
                 status=sale_data.status,
                 payment_method=sale_data.payment_method,
                 comment=sale_data.comment,

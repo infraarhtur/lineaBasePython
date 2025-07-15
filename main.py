@@ -13,6 +13,7 @@ from app.view.category_endpoints import router as category_router
 from app.view.client_endpoints import router as client_router
 from app.view.products_endpoints import router as product_router
 from app.view.provider_endpoints import router as provider_router
+from app.view.report_endpoints import router as report_router
 from app.view.sale_endpoints import router as sale_router
 from app.workers.scheduler import start_worker
 
@@ -52,6 +53,7 @@ app.include_router(product_router, prefix="/api/products", tags=["Products"])
 app.include_router(category_router, prefix="/api/category", tags=["Categories"])
 app.include_router(provider_router, prefix="/api/provider", tags=["Providers"])
 app.include_router(sale_router, prefix="/api/sale", tags=["Sales"])
+app.include_router(report_router, prefix="/api/report", tags=["reports"])
 
 # Eventos de arranque y apagado
 @app.on_event("startup")

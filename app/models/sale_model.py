@@ -22,6 +22,7 @@ class SaleModel(Base):
     client_id = Column(UUIDType(as_uuid=True), ForeignKey("public.clients.id", ondelete="SET NULL"), nullable=True)
     sale_date = Column(DateTime, default=datetime.utcnow, nullable=False)
     total_amount = Column(Numeric(10, 2), nullable=False)
+    total_discount = Column(Numeric(10, 2), nullable=False)
     status = Column(String, default="pending", nullable=False)
     payment_method = Column(String, nullable=True)
     comment = Column(Text, nullable=True)
@@ -38,7 +39,8 @@ class SaleModel(Base):
     def __repr__(self):
         return (
             f"<SaleModel(id={self.id}, client_id={self.client_id}, sale_date={self.sale_date}, "
-            f"total_amount={self.total_amount}, status={self.status}, payment_method={self.payment_method})>"
+            f"total_amount={self.total_amount}, status={self.status}, payment_method={self.payment_method},"
+            f"total_discount={self.total_discount}>"
         )
 # -------------------------------
 # Esquemas Pydantic (para FastAPI)
@@ -68,6 +70,7 @@ class SaleCreateSchema(BaseModel):
     client_id: uuid.UUID = Field(..., description="ID del cliente")
     sale_date: Optional[datetime] = Field(default_factory=datetime.utcnow, description="Fecha de la venta")
     total_amount: float = Field(..., gt=0, description="Total de la venta")
+    total_discount: float = Field(..., ge=0, description="Total del descuento aplicado")
     status: Optional[str] = Field(default="pending", description="Estado de la venta (pending, paid, canceled)")
     payment_method: Optional[str] = Field(None, description="Método de pago (tarjeta, efectivo, etc.)")
     comment: Optional[str] = Field(None, description="Comentario adicional sobre la venta")
@@ -81,6 +84,7 @@ class SaleUpdateSchema(BaseModel):
     client_id: Optional[uuid.UUID] = Field(None, description="ID del cliente")
     sale_date: Optional[datetime] = Field(None, description="Fecha de la venta")
     total_amount: Optional[float] = Field(None, gt=0, description="Total de la venta")
+    total_discount: Optional[float] = Field(None, ge=0, description="Total del descuento aplicado")
     status: Optional[str] = Field(None, description="Estado (pending, paid, canceled)")
     payment_method: Optional[str] = Field(None, description="Método de pago")
     comment: Optional[str] = Field(None, description="Comentario")

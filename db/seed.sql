@@ -6,7 +6,7 @@
 
 
 INSERT INTO public.products (id, "name", description, purchase_price, sale_price, stock, created_at,is_active, updated_at, created_by)
-VALUES('d4ffc7a1-1ac0-4ce7-8d05-ed7c01602f28', 'Hambuguesa doble carne', 'agua sin gas', 0, 1000, 100, CURRENT_TIMESTAMP,true, NULL, NULL);
+VALUES('d4ffc7a1-1ac0-4ce7-8d05-ed7c01602f28', 'Hambuguesa doble carne', 'agua sin gas', 800, 1000, 100, CURRENT_TIMESTAMP,true, NULL, NULL);
 
 INSERT INTO public.products (id, "name", description, purchase_price, sale_price, stock, created_at,is_active, updated_at, created_by)
 VALUES('b86ce202-b654-4bd9-9045-0a274642f5fb'::uuid, 'Botella de jack daniels', 'este es un producto nuevo', 20000.00, 50000.00, 5, CURRENT_TIMESTAMP,true, NULL, NUll);

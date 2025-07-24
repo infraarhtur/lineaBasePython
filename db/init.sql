@@ -182,11 +182,12 @@ $$;
 
 -- Función para obtener las ventas por producto
 -- Paso 1: eliminar la función actual
-DROP FUNCTION IF EXISTS public.get_sales_by_products(DATE, DATE);
+DROP FUNCTION IF EXISTS public.get_sales_by_products(DATE, DATE, TEXT);
 -- Paso 2: crear la función actualizada
 CREATE OR REPLACE FUNCTION public.get_sales_by_products(
     start_date DATE,
-    end_date DATE
+    end_date DATE,
+    sale_status TEXT
 )
 RETURNS TABLE (
     product_name TEXT,
@@ -194,7 +195,7 @@ RETURNS TABLE (
     sale_price NUMERIC(10,2),
     total_units_sold BIGINT,
     total_revenue NUMERIC(10,2),
-    total_discount NUMERIC(10,2)    
+    total_discount NUMERIC(10,2)
 )
 LANGUAGE plpgsql
 AS $$
@@ -206,13 +207,13 @@ BEGIN
         p.sale_price,
         SUM(sd.quantity) AS total_units_sold,
         SUM(sd.total) AS total_revenue,
-		SUM(sd.subtotal - sd.total) AS total_discount
+        SUM(sd.subtotal - sd.total) AS total_discount
     FROM sale_details sd
     JOIN sales s ON sd.sale_id = s.id
     JOIN products p ON sd.product_id = p.id
     WHERE s.sale_date >= start_date
       AND s.sale_date < end_date
-      AND s.status = 'paid'
+      AND s.status = sale_status
       AND s.is_active = TRUE
     GROUP BY p.id, p.name, p.purchase_price, p.sale_price
     ORDER BY total_units_sold DESC, total_revenue DESC;

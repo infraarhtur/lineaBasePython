@@ -23,8 +23,8 @@ CREATE TABLE public.categories (
 	"name" text NOT NULL,
 	description text NULL,
 	is_active bool DEFAULT true NULL,
-	created_at timestamp DEFAULT CURRENT_TIMESTAMP NULL,
-	updated_at timestamp NULL,
+	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NULL,
+	updated_at TIMESTAMP WITH TIME ZONE NULL,
 	created_by uuid NULL,
 	CONSTRAINT categories_name_key UNIQUE (name),
 	CONSTRAINT categories_pkey PRIMARY KEY (id)
@@ -39,8 +39,8 @@ CREATE TABLE public.clients (
 	address text NULL,
 	"comment" text NULL,
 	is_active bool DEFAULT true NULL,
-	created_at timestamp DEFAULT CURRENT_TIMESTAMP NULL,
-	updated_at timestamp NULL,
+	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NULL,
+	updated_at TIMESTAMP WITH TIME ZONE NULL,
 	created_by uuid NULL,
 	CONSTRAINT clients_email_key UNIQUE (email),
 	CONSTRAINT clients_pkey PRIMARY KEY (id)
@@ -56,9 +56,9 @@ CREATE TABLE public.products (
 	purchase_price numeric(10, 2) NOT NULL,
 	sale_price numeric(10, 2) NOT NULL,
 	stock int4 NOT NULL,
-	created_at timestamp DEFAULT CURRENT_TIMESTAMP NULL,
+	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NULL,
 	is_active bool DEFAULT true NULL,
-	updated_at timestamp NULL,
+	updated_at TIMESTAMP WITH TIME ZONE NULL,
 	created_by uuid NULL,
 	CONSTRAINT products_pkey PRIMARY KEY (id)
 );
@@ -73,8 +73,8 @@ CREATE TABLE public.providers (
 	email text NULL,
 	address text NULL,
 	is_active bool DEFAULT true NULL,
-	created_at timestamp DEFAULT CURRENT_TIMESTAMP NULL,
-	updated_at timestamp NULL,
+	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NULL,
+	updated_at TIMESTAMP WITH TIME ZONE NULL,
 	created_by uuid NULL,
 	CONSTRAINT providers_pkey PRIMARY KEY (id)
 );
@@ -109,15 +109,15 @@ GRANT ALL ON TABLE public.product_providers TO postgres;
 CREATE TABLE sales (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), -- Unique sale ID
     client_id UUID,
-    sale_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    sale_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     total_amount DECIMAL(10,2), -- Total of the sale
 	total_discount numeric(10, 2) DEFAULT 0.00 NULL,
     status TEXT DEFAULT 'pending', -- Status: pending, paid, canceled, etc.
     payment_method TEXT, -- e.g., 'tarjeta de crédito'
     comment TEXT, -- Additional notes	
 	is_active bool DEFAULT true NULL,
-	created_at timestamp DEFAULT CURRENT_TIMESTAMP NULL,
-	updated_at timestamp NULL,
+	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NULL,
+	updated_at TIMESTAMP WITH TIME ZONE NULL,
     created_by UUID, -- User who created the sale
     FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE SET NULL
 );
@@ -182,11 +182,12 @@ $$;
 
 -- Función para obtener las ventas por producto
 -- Paso 1: eliminar la función actual
-DROP FUNCTION IF EXISTS public.get_sales_by_products(DATE, DATE);
+DROP FUNCTION IF EXISTS public.get_sales_by_products(DATE, DATE, TEXT);
 -- Paso 2: crear la función actualizada
 CREATE OR REPLACE FUNCTION public.get_sales_by_products(
     start_date DATE,
-    end_date DATE
+    end_date DATE,
+    sale_status TEXT
 )
 RETURNS TABLE (
     product_name TEXT,
@@ -194,7 +195,7 @@ RETURNS TABLE (
     sale_price NUMERIC(10,2),
     total_units_sold BIGINT,
     total_revenue NUMERIC(10,2),
-    total_discount NUMERIC(10,2)    
+    total_discount NUMERIC(10,2)
 )
 LANGUAGE plpgsql
 AS $$
@@ -206,13 +207,13 @@ BEGIN
         p.sale_price,
         SUM(sd.quantity) AS total_units_sold,
         SUM(sd.total) AS total_revenue,
-		SUM(sd.subtotal - sd.total) AS total_discount
+        SUM(sd.subtotal - sd.total) AS total_discount
     FROM sale_details sd
     JOIN sales s ON sd.sale_id = s.id
     JOIN products p ON sd.product_id = p.id
     WHERE s.sale_date >= start_date
       AND s.sale_date < end_date
-      AND s.status = 'paid'
+      AND s.status = sale_status
       AND s.is_active = TRUE
     GROUP BY p.id, p.name, p.purchase_price, p.sale_price
     ORDER BY total_units_sold DESC, total_revenue DESC;

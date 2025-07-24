@@ -23,8 +23,8 @@ CREATE TABLE public.categories (
 	"name" text NOT NULL,
 	description text NULL,
 	is_active bool DEFAULT true NULL,
-	created_at timestamp DEFAULT CURRENT_TIMESTAMP NULL,
-	updated_at timestamp NULL,
+	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NULL,
+	updated_at TIMESTAMP WITH TIME ZONE NULL,
 	created_by uuid NULL,
 	CONSTRAINT categories_name_key UNIQUE (name),
 	CONSTRAINT categories_pkey PRIMARY KEY (id)
@@ -39,8 +39,8 @@ CREATE TABLE public.clients (
 	address text NULL,
 	"comment" text NULL,
 	is_active bool DEFAULT true NULL,
-	created_at timestamp DEFAULT CURRENT_TIMESTAMP NULL,
-	updated_at timestamp NULL,
+	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NULL,
+	updated_at TIMESTAMP WITH TIME ZONE NULL,
 	created_by uuid NULL,
 	CONSTRAINT clients_email_key UNIQUE (email),
 	CONSTRAINT clients_pkey PRIMARY KEY (id)
@@ -56,9 +56,9 @@ CREATE TABLE public.products (
 	purchase_price numeric(10, 2) NOT NULL,
 	sale_price numeric(10, 2) NOT NULL,
 	stock int4 NOT NULL,
-	created_at timestamp DEFAULT CURRENT_TIMESTAMP NULL,
+	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NULL,
 	is_active bool DEFAULT true NULL,
-	updated_at timestamp NULL,
+	updated_at TIMESTAMP WITH TIME ZONE NULL,
 	created_by uuid NULL,
 	CONSTRAINT products_pkey PRIMARY KEY (id)
 );
@@ -73,8 +73,8 @@ CREATE TABLE public.providers (
 	email text NULL,
 	address text NULL,
 	is_active bool DEFAULT true NULL,
-	created_at timestamp DEFAULT CURRENT_TIMESTAMP NULL,
-	updated_at timestamp NULL,
+	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NULL,
+	updated_at TIMESTAMP WITH TIME ZONE NULL,
 	created_by uuid NULL,
 	CONSTRAINT providers_pkey PRIMARY KEY (id)
 );
@@ -109,15 +109,15 @@ GRANT ALL ON TABLE public.product_providers TO postgres;
 CREATE TABLE sales (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), -- Unique sale ID
     client_id UUID,
-    sale_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    sale_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     total_amount DECIMAL(10,2), -- Total of the sale
 	total_discount numeric(10, 2) DEFAULT 0.00 NULL,
     status TEXT DEFAULT 'pending', -- Status: pending, paid, canceled, etc.
     payment_method TEXT, -- e.g., 'tarjeta de crédito'
     comment TEXT, -- Additional notes	
 	is_active bool DEFAULT true NULL,
-	created_at timestamp DEFAULT CURRENT_TIMESTAMP NULL,
-	updated_at timestamp NULL,
+	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NULL,
+	updated_at TIMESTAMP WITH TIME ZONE NULL,
     created_by UUID, -- User who created the sale
     FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE SET NULL
 );

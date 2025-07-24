@@ -33,13 +33,14 @@ def get_report_sale_summary_payment(start_date: date = Query(..., description="F
 @router.get("/report_sales_by_products", response_model=List[ReportSalesByProductsModel])
 def get_report_sales_by_products(start_date: date = Query(..., description="Fecha de inicio"),
     end_date: date = Query(..., description="Fecha de fin"),
+    status: str = Query(..., description="Estado de la venta"),
     db: Session = Depends(get_db)):
     """
     Recupera el reporte de ventas por productos.
     """
     logic = ReportLogic(db)
     try:
-        return logic.get_sales_by_products(start_date, end_date)
+        return logic.get_sales_by_products(start_date, end_date, status)
     except Exception:
         raise HTTPException(status_code=500, detail="Error interno del servidor")
     

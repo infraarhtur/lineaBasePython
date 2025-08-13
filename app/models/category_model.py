@@ -1,5 +1,5 @@
-from datetime import datetime
 import uuid
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -24,6 +24,8 @@ class CategoryModel(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=True)
     updated_at = Column(DateTime, nullable=True)
     created_by = Column(UUID(as_uuid=True), nullable=True)
+    company_id = Column(UUID(as_uuid=True), nullable=True)
+    updated_by = Column(UUID(as_uuid=True), nullable=True)
 
     #Relación con productos (muchos a muchos)
     products = relationship(
@@ -43,6 +45,9 @@ class CategoryCreateSchema(BaseModel):
     name: str = Field(..., min_length=2, max_length=100, description="Nombre de la categoría")
     description: Optional[str] = Field(None, description="Descripción de la categoría")
     is_active: bool = Field(True, description="Indicates if the category is active")
+    company_id: Optional[uuid.UUID] = Field(None, description="ID de la compañía")
+    created_by: Optional[uuid.UUID] = Field(None, description="ID del usuario que creó la categoría")
+    updated_by: Optional[uuid.UUID] = Field(None, description="ID del usuario que actualizó la categoría")
     created_at: datetime | None = Field(
         default_factory=datetime.utcnow, 
         description="Timestamp when the category was created"

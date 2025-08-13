@@ -27,6 +27,8 @@ class ClientModel(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=True)
     updated_at = Column(DateTime, nullable=True)
     created_by = Column(UUID(as_uuid=True), nullable=True)
+    company_id = Column(UUID(as_uuid=True), nullable=True)
+    updated_by = Column(UUID(as_uuid=True), nullable=True)
 
     sales = relationship("SaleModel", back_populates="client")
     def __repr__(self):
@@ -50,6 +52,9 @@ class ClientCreateSchema(BaseModel):
     address: str | None = Field(None, description="Address of the client")  # Campo opcional
     comment: str | None = Field(None, description="Comment about the client")  # Campo opcional
     is_active: bool = Field(True, description="Indicates if the client is active")
+    company_id: uuid.UUID | None = Field(None, description="ID de la compañía")
+    created_by: uuid.UUID | None = Field(None, description="ID del usuario que creó el cliente")
+    updated_by: uuid.UUID | None = Field(None, description="ID del usuario que actualizó el cliente")
     created_at: datetime | None = Field(
         default_factory=datetime.utcnow, 
         description="Timestamp when the client was created"
@@ -61,6 +66,9 @@ class ClientSchema(ClientCreateSchema):
     Esquema para representar un cliente con un ID.
     """
     id:  uuid.UUID = Field(..., description="Unique identifier for the client")
+    company_id: uuid.UUID | None = Field(None, description="ID de la compañía")
+    created_by: uuid.UUID | None = Field(None, description="ID del usuario que creó el cliente")
+    updated_by: uuid.UUID | None = Field(None, description="ID del usuario que actualizó el cliente")
 
     class Config:
         from_attributes = True  # Permite la compatibilidad con modelos ORM

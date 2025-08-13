@@ -4,8 +4,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String
-from sqlalchemy.dialects.postgresql import UUID as UUIDType
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID as UUIDType
 from sqlalchemy.orm import relationship
 
 from app.data.database import Base
@@ -28,6 +28,8 @@ class ProductModel(Base):
     is_active = Column(Boolean, default=True, nullable=True)
     updated_at = Column(DateTime, nullable=True)
     created_by = Column(UUID(as_uuid=True), nullable=True)
+    company_id = Column(UUID(as_uuid=True), nullable=True)
+    updated_by = Column(UUID(as_uuid=True), nullable=True)
 
 
     # Relación con categorías (muchos a muchos)
@@ -74,6 +76,9 @@ class ProductCreateSchema(BaseModel):
     category_ids: Optional[List[uuid.UUID]] = Field(default_factory=list, description="IDs de categorías asociadas")
     providers_ids: Optional[List[uuid.UUID]] = Field(default_factory=list, description="IDs de proveedores asociadas")
     is_active: bool = Field(True, description="Indicates if the client is active")
+    company_id: Optional[uuid.UUID] = Field(None, description="ID de la compañía")
+    created_by: Optional[uuid.UUID] = Field(None, description="ID del usuario que creó el producto")
+    updated_by: Optional[uuid.UUID] = Field(None, description="ID del usuario que actualizó el producto")
 
 class CategorySchema(BaseModel):
     id: uuid.UUID
@@ -106,6 +111,9 @@ class ProductSchema(BaseModel):
     created_at: Optional[datetime]    
     categories: Optional[List[CategorySchema]] = []
     providers: Optional[List[ProviderSchema]] = []
+    company_id: Optional[uuid.UUID] = Field(None, description="ID de la compañía")
+    created_by: Optional[uuid.UUID] = Field(None, description="ID del usuario que creó el producto")
+    updated_by: Optional[uuid.UUID] = Field(None, description="ID del usuario que actualizó el producto")
 
     class Config:
         from_attributes = True

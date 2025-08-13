@@ -1,6 +1,6 @@
 import uuid
-
-from sqlalchemy import Column, ForeignKey, Integer, Numeric, Text
+from datetime import datetime
+from sqlalchemy import Column, ForeignKey, Integer, Numeric, Text, DateTime
 from sqlalchemy.dialects.postgresql import UUID as UUIDType
 from sqlalchemy.orm import relationship
 
@@ -24,6 +24,11 @@ class SaleDetailModel(Base):
     total = Column(Numeric(10, 2), nullable=True)
     unit_cost = Column(Numeric(10, 2), nullable=True)
     comment = Column(Text, nullable=True)
+    company_id = Column(UUIDType(as_uuid=True), nullable=True)
+    created_by = Column(UUIDType(as_uuid=True), nullable=True)
+    updated_by = Column(UUIDType(as_uuid=True), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=True)
+    updated_at = Column(DateTime, nullable=True)
 
     # 🔄 Relación con venta (referencia por nombre para evitar errores de importación circular)
     sale = relationship("SaleModel", back_populates="details")

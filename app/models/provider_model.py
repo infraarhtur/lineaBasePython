@@ -27,6 +27,8 @@ class ProviderModel(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=True)
     updated_at = Column(DateTime, nullable=True)
     created_by = Column(UUID(as_uuid=True), nullable=True)
+    company_id = Column(UUID(as_uuid=True), nullable=True)
+    updated_by = Column(UUID(as_uuid=True), nullable=True)
 
     # Relación muchos a muchos con productos
     products = relationship(
@@ -58,6 +60,9 @@ class ProviderCreateSchema(BaseModel):
     email: Optional[str] = Field(None, description="Correo electrónico")
     address: Optional[str] = Field(None, description="Dirección del proveedor")
     is_active: bool = Field(True, description="Indica si el proveedor está activo")
+    company_id: Optional[uuid.UUID] = Field(None, description="ID de la compañía")
+    created_by: Optional[uuid.UUID] = Field(None, description="ID del usuario que creó el proveedor")
+    updated_by: Optional[uuid.UUID] = Field(None, description="ID del usuario que actualizó el proveedor")
     created_at: Optional[datetime] = Field(
         default_factory=datetime.utcnow,
         description="Fecha y hora de creación del proveedor"
@@ -66,6 +71,9 @@ class ProviderCreateSchema(BaseModel):
 
 class ProviderSchema(ProviderCreateSchema):
     id: uuid.UUID = Field(..., description="Identificador único del proveedor")
+    company_id: Optional[uuid.UUID] = Field(None, description="ID de la compañía")
+    created_by: Optional[uuid.UUID] = Field(None, description="ID del usuario que creó el proveedor")
+    updated_by: Optional[uuid.UUID] = Field(None, description="ID del usuario que actualizó el proveedor")
 
     class Config:
         from_attributes = True

@@ -1,4 +1,7 @@
-from sqlalchemy import Column, Float, ForeignKey, Integer
+import uuid
+from datetime import datetime
+
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer
 from sqlalchemy.dialects.postgresql import UUID as UUIDType
 from sqlalchemy.orm import relationship
 
@@ -14,6 +17,11 @@ class ProductProviderModel(Base):
 
     purchase_price = Column(Float, nullable=False,  default=0)
     delivery_time = Column(Integer, nullable=False,  default=0)
+    company_id = Column(UUIDType(as_uuid=True), nullable=True)
+    created_by = Column(UUIDType(as_uuid=True), nullable=True)
+    updated_by = Column(UUIDType(as_uuid=True), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=True)
+    updated_at = Column(DateTime, nullable=True)
 
     product = relationship(
         "ProductModel",

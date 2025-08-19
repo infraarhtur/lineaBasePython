@@ -58,6 +58,7 @@ class ProductLogic:
             name = kwargs.get("name")
             category_ids = kwargs.get("category_ids", [])
             providers_ids = kwargs.get("providers_ids", [])
+            company_id = kwargs.get("company_id")
             # Validar campos obligatorios
             if not name:
                 raise ValidationError(const.ERROR_MISSING_REQUIRED_FIELDS)
@@ -88,7 +89,8 @@ class ProductLogic:
                 stock=kwargs.get("stock"),
                 created_at= datetime.utcnow(),
                 categories=categories,  # Asociar categorías
-                providers=providers # Asociar providers
+                providers=providers, # Asociar providers
+                company_id=company_id
             )  
             return self.product_repo.save(product)
         

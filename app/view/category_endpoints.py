@@ -157,7 +157,7 @@ def create_clien_queue(category: CategoryCreateSchema):
     """
     try:
         service = CategoryLogic()
-        return service.create_category_queue(name=category.name, email=category.email, phone=category.phone)
+        return service.create_category_queue(name=category.name, description=category.description, company_id=category.company_id)
     except ValidationError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except NotFoundError as ne:

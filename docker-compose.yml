@@ -6,21 +6,25 @@ services:
     container_name: linea_base_db
     restart: unless-stopped
     ports:
-      - "5434:5432"  # expone PostgreSQL solo si es necesario , # Puerto externo 5434, pero dentro de Docker sigue siendo 5432
+      - "5434:5432"
     environment:
+      # Estas variables pueden venir de tu .env
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME} -h 127.0.0.1"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
     networks:
       - app_network
     volumes:
       - pgdata:/var/lib/postgresql/data
+      # Monta la carpeta con tus scripts. Ej: ./db/01-init.sql y ./db/02-seed.sql
       - ./db:/docker-entrypoint-initdb.d
+    env_file:
+      - .env
 
   app:
     build: .
@@ -31,7 +35,8 @@ services:
     ports:
       - "8001:8001"
     environment:
-      DB_URL: "postgresql://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}"
+      # Si no defines DB_PORT en .env, Postgres dentro del contenedor usa 5432
+      DB_URL: "postgresql://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT:-5432}/${DB_NAME}"
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}

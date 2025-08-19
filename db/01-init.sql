@@ -22,6 +22,38 @@ DROP TABLE IF EXISTS public.categories;
 -- CREATE SCHEMA public AUTHORIZATION arhtur; -- Comentado porque el usuario no existe
 
 COMMENT ON SCHEMA public IS 'standard public schema';
+-- --------------------------------------------------------------------------------
+-- Crear funciones de triggers antes de cualquier creación de trigger
+-- para evitar errores de dependencia durante la inicialización.
+-- --------------------------------------------------------------------------------
+
+-- DROP FUNCTION public.set_created_at();
+
+CREATE OR REPLACE FUNCTION public.set_created_at()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+  IF NEW.created_at IS NULL THEN
+    NEW.created_at := now();
+  END IF;
+  RETURN NEW;
+END;
+$function$
+;
+
+-- DROP FUNCTION public.set_updated_at();
+
+CREATE OR REPLACE FUNCTION public.set_updated_at()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+  NEW.updated_at := now();
+  RETURN NEW;
+END;
+$function$
+;
 -- public.categories definition
 
 -- Drop table
@@ -715,33 +747,6 @@ CREATE OR REPLACE FUNCTION public.pgp_sym_encrypt_bytea(bytea, text)
 AS '$libdir/pgcrypto', $function$pgp_sym_encrypt_bytea$function$
 ;
 
--- DROP FUNCTION public.set_created_at();
-
-CREATE OR REPLACE FUNCTION public.set_created_at()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
-BEGIN
-  IF NEW.created_at IS NULL THEN
-    NEW.created_at := now();
-  END IF;
-  RETURN NEW;
-END;
-$function$
-;
-
--- DROP FUNCTION public.set_updated_at();
-
-CREATE OR REPLACE FUNCTION public.set_updated_at()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $function$
-BEGIN
-  NEW.updated_at := now();
-  RETURN NEW;
-END;
-$function$
-;
 
 -- DROP FUNCTION public.uuid_generate_v1();
 

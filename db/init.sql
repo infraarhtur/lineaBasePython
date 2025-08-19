@@ -19,7 +19,7 @@ DROP TABLE IF EXISTS public.categories;
 
 -- DROP SCHEMA public;
 
-CREATE SCHEMA public AUTHORIZATION arhtur;
+-- CREATE SCHEMA public AUTHORIZATION arhtur; -- Comentado porque el usuario no existe
 
 COMMENT ON SCHEMA public IS 'standard public schema';
 -- public.categories definition

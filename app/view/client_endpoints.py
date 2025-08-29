@@ -8,19 +8,25 @@ from app.data.database import get_db
 from app.logic.client_logic import ClientLogic
 from app.models.client_model import ClientCreateSchema, ClientSchema
 from app.utils import constans as const
+from app.utils.auth_utils import get_bearer_token
 from app.utils.error_handling import NotFoundError, ValidationError
 from app.workers.scheduler import start_worker
 
 router = APIRouter()
 
 @router.post("/", response_model=ClientSchema, status_code=status.HTTP_201_CREATED)
-def create_client(client: ClientCreateSchema, db: Session = Depends(get_db)):
+def create_client(
+    client: ClientCreateSchema, 
+    db: Session = Depends(get_db),
+    token: str = Depends(get_bearer_token)
+):
     """
     Crea un nuevo cliente.
 
     Args:
         client (ClientCreateSchema): Datos del cliente a crear.
         db (Session): Sesión de base de datos inyectada automáticamente.
+        token (str): Token de autorización Bearer.
 
     Returns:
         ClientSchema: Cliente creado.
@@ -39,13 +45,16 @@ def create_client(client: ClientCreateSchema, db: Session = Depends(get_db)):
     
 
 @router.get("/", response_model=List[ClientSchema])
-def get_all_clients(db: Session = Depends(get_db)):
-
+def get_all_clients(
+    db: Session = Depends(get_db),
+    token: str = Depends(get_bearer_token)
+):
     """
     Recupera todos los clientes.
 
     Args:
         db (Session): Sesión activa de SQLAlchemy para la base de datos.
+        token (str): Token de autorización Bearer.
 
     Returns:
         List[ClientSchema]: Lista de todos los clientes.
@@ -62,13 +71,18 @@ def get_all_clients(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=const.ERROR_INTERNAL_SERVER)
 
 @router.get("/{client_id}", response_model=ClientSchema)
-def get_client(client_id: str, db: Session = Depends(get_db)):
+def get_client(
+    client_id: str, 
+    db: Session = Depends(get_db),
+    token: str = Depends(get_bearer_token)
+):
     """
     Recupera un cliente por su ID.
 
     Args:
         client_id (str): ID del cliente a buscar.
         db (Session): Sesión de base de datos inyectada automáticamente.
+        token (str): Token de autorización Bearer.
 
     Returns:
         ClientSchema: Cliente encontrado.
@@ -89,7 +103,12 @@ def get_client(client_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=const.ERROR_INTERNAL_SERVER)
 
 @router.put("/{client_id}", response_model=ClientSchema)
-def update_client(client_id: str, client: ClientCreateSchema, db: Session = Depends(get_db)):
+def update_client(
+    client_id: str, 
+    client: ClientCreateSchema, 
+    db: Session = Depends(get_db),
+    token: str = Depends(get_bearer_token)
+):
     """
     Actualiza los datos de un cliente.
 
@@ -97,6 +116,7 @@ def update_client(client_id: str, client: ClientCreateSchema, db: Session = Depe
         client_id (str): ID del cliente a actualizar.
         client (ClientCreateSchema): Datos actualizados del cliente.
         db (Session): Sesión de base de datos inyectada automáticamente.
+        token (str): Token de autorización Bearer.
 
     Returns:
         ClientSchema: Cliente actualizado.
@@ -120,13 +140,18 @@ def update_client(client_id: str, client: ClientCreateSchema, db: Session = Depe
 
 @router.delete("/{client_id}" ,response_model=bool,
                 status_code=status.HTTP_200_OK)
-def delete_client(client_id: str, db: Session = Depends(get_db)):
+def delete_client(
+    client_id: str, 
+    db: Session = Depends(get_db),
+    token: str = Depends(get_bearer_token)
+):
     """
     Elimina un cliente por su ID.
 
     Args:
         client_id (str): ID del cliente a eliminar.
         db (Session): Sesión activa de SQLAlchemy para la base de datos.
+        token (str): Token de autorización Bearer.
 
     Raises:
         HTTPException: Si ocurre algún error relacionado con validaciones,
@@ -145,13 +170,16 @@ def delete_client(client_id: str, db: Session = Depends(get_db)):
 
 @router.post("/clients_queue/", response_model=str, 
                  status_code=status.HTTP_202_ACCEPTED)
-def create_clien_queue(client: ClientCreateSchema):
+def create_clien_queue(
+    client: ClientCreateSchema,
+    token: str = Depends(get_bearer_token)
+):
     """
     Crea un nuevo cliente.
 
     Args:
         client (ClientCreateSchema): Datos del cliente a crear.
-        db (Session): Sesión de base de datos inyectada automáticamente.
+        token (str): Token de autorización Bearer.
 
     Returns:
         ClientSchema: Cliente creado.
@@ -169,13 +197,14 @@ def create_clien_queue(client: ClientCreateSchema):
     
 @router.get("/process_messages_queue/", response_model=List, 
                  status_code=status.HTTP_202_ACCEPTED)
-def process_messages_queue():
+def process_messages_queue(
+    token: str = Depends(get_bearer_token)
+):
     """
     Crea un nuevo cliente.
 
     Args:
-        client (ClientCreateSchema): Datos del cliente a crear.
-        db (Session): Sesión de base de datos inyectada automáticamente.
+        token (str): Token de autorización Bearer.
 
     Returns:
         ClientSchema: Cliente creado.
